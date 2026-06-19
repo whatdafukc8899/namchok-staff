@@ -21,13 +21,15 @@ body{background:#0d0d0d;}
 select.inp option{background:#1a1a1a;}
 .sec-title{font-size:11px;color:#888;display:flex;align-items:center;gap:5px;margin-bottom:7px;}
 .ch-tabs{display:flex;gap:6px;flex-wrap:wrap;}
-.ch-tab{padding:7px 14px;border-radius:20px;font-size:12px;border:.5px solid #2a2a2a;background:#1a1a1a;color:#888;cursor:pointer;white-space:nowrap;}
+.ch-tab{padding:7px 14px;border-radius:20px;font-size:12px;border:.5px solid #2a2a2a;background:#1a1a1a;color:#888;cursor:pointer;white-space:nowrap;transition:transform .15s,box-shadow .15s;}
+.ch-tab:hover{transform:translateY(-2px);}
 .ch-tab.active{color:#111;font-weight:500;}
 .entry-card{background:#1a1a1a;border:.5px solid #2a2a2a;border-radius:12px;overflow:hidden;}
 .entry-section{padding:11px 13px;border-bottom:.5px solid #1e1e1e;}
 .entry-section:last-child{border-bottom:none;}
 .action-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;}
-.act-btn{display:flex;align-items:center;gap:9px;padding:11px 12px;border-radius:10px;border:.5px solid #2a2a2a;background:#161616;cursor:pointer;transition:all .15s;}
+.act-btn{display:flex;align-items:center;gap:9px;padding:11px 12px;border-radius:10px;border:.5px solid #2a2a2a;background:#161616;cursor:pointer;transition:transform .15s,box-shadow .15s;}
+.act-btn:hover{transform:translateY(-3px);}
 .act-btn.selected{border-width:1.5px;}
 .act-btn:active{transform:scale(0.97);}
 .act-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px;}
@@ -36,7 +38,8 @@ select.inp option{background:#1a1a1a;}
 .act-check{font-size:14px;color:#444;flex-shrink:0;}
 .act-check.on{color:#4caf81;}
 .reason-row{display:flex;align-items:center;gap:8px;margin-top:6px;}
-.commit-btn{width:100%;padding:14px;background:#1a2a1a;border:.5px solid #2a4a2a;border-radius:10px;color:#4caf81;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
+.commit-btn{width:100%;padding:14px;background:#1a2a1a;border:.5px solid #2a4a2a;border-radius:10px;color:#4caf81;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .15s;}
+.commit-btn:hover:not(:disabled){transform:translateY(-2px);}
 .commit-btn:active{opacity:.75;}
 .commit-btn:disabled{opacity:.35;cursor:default;}
 .add-reason{display:flex;gap:6px;margin-top:8px;}
@@ -170,7 +173,14 @@ const ACTIONS=[
   {id:'deposit',name:'ฝากแล้ว',icon:'ti-cash',color:'#4caf81',bg:'#0a2a1a'},
   {id:'nodeposit',name:'ไม่ฝาก',icon:'ti-user-x',color:'#e05c5c',bg:'#2a0a0a'},
 ];
-const DEFAULT_REASONS=['ไม่มีเงิน','ขอคิดดูก่อน','ไม่สนใจ','ไม่รับสาย','อ่านไม่ตอบ','บล็อกทันที'];
+const DEFAULT_REASONS=[
+  {l:'ไม่มีเงิน',c:'#f59e0b'},
+  {l:'ขอคิดดูก่อน',c:'#3b82f6'},
+  {l:'ไม่สนใจ',c:'#888'},
+  {l:'ไม่รับสาย',c:'#a855f7'},
+  {l:'อ่านไม่ตอบ',c:'#10b981'},
+  {l:'บล็อกทันที',c:'#e05c5c'},
+];
 
 let curCh='live';
 let selected=new Set();
@@ -250,7 +260,7 @@ function renderFeed(){
       </div>
       <div class="fi-body">
         <div class="fi-tags">${tags}</div>
-        ${l.reason?`<div class="fi-reason"><i class="ti ti-message-x"></i> ${l.reason}</div>`:''}
+        ${l.reason?(()=>{const rc=reasons.find(r=>rLabel(r)===l.reason);const col=rc?rColor(rc,reasons.indexOf(rc)):'#e05c5c';return`<div class="fi-reason" style="color:${col}"><i class="ti ti-message-x"></i> ${l.reason}</div>`;})():''}
         ${l.staff?`<div class="fi-reason"><i class="ti ti-user"></i> ${l.staff}</div>`:''}
       </div>
       <button class="fi-del" onclick="delLog(${l.id})"><i class="ti ti-x"></i></button>
@@ -291,24 +301,36 @@ function updateReasonBars(){
   const entries=Object.entries(cnt).sort((a,b)=>b[1]-a[1]);
   if(!entries.length){wrap.innerHTML='<div style="font-size:12px;color:#333;padding:8px 0;">ยังไม่มีข้อมูล</div>';return;}
   const max=entries[0][1];
-  wrap.innerHTML=entries.map(([label,count])=>`
-    <div class="rbar-row">
-      <div class="rbar-name" title="${label}">${label}</div>
-      <div class="rbar-track"><div class="rbar-fill" style="width:${Math.round(count/max*100)}%"></div></div>
-      <div class="rbar-cnt">${count}</div>
-    </div>`).join('');
+  const colorMap={};
+  reasons.forEach((r,i)=>{colorMap[rLabel(r)]=rColor(r,i);});
+  wrap.innerHTML=entries.map(([label,count])=>{
+    const color=colorMap[label]||'#e05c5c';
+    return`<div class="rbar-row">
+      <div class="rbar-name" title="${label}" style="color:${color}">${label}</div>
+      <div class="rbar-track"><div class="rbar-fill" style="width:${Math.round(count/max*100)}%;background:${color}"></div></div>
+      <div class="rbar-cnt" style="color:${color}">${count}</div>
+    </div>`;
+  }).join('');
 }
+
+const REASON_COLORS=['#f59e0b','#3b82f6','#888','#a855f7','#10b981','#e05c5c','#D4AF37','#06c755','#ff0050','#c084fc'];
+function rLabel(r){return typeof r==='object'?r.l:r;}
+function rColor(r,i){return typeof r==='object'?r.c:REASON_COLORS[i%REASON_COLORS.length];}
 
 function addReason(){
   const inp=document.getElementById('new-reason');
   const label=inp.value.trim();if(!label)return;
-  reasons.push(label);inp.value='';buildReasonSelect();saveData();
+  const color=REASON_COLORS[reasons.length%REASON_COLORS.length];
+  reasons.push({l:label,c:color});inp.value='';buildReasonSelect();saveData();
 }
 
 function buildReasonSelect(){
   const sel=document.getElementById('reason-select');
   sel.innerHTML='<option value="">— เลือกเหตุผล —</option>';
-  reasons.forEach(r=>{const o=document.createElement('option');o.value=r;o.textContent=r;sel.appendChild(o);});
+  reasons.forEach((r,i)=>{
+    const o=document.createElement('option');
+    o.value=rLabel(r);o.textContent=rLabel(r);sel.appendChild(o);
+  });
 }
 
 function saveData(){
