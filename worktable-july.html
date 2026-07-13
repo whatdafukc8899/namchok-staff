@@ -20,7 +20,7 @@ body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,"Segoe UI",sa
 .login-err{font-size:12px;color:#e05c5c;text-align:center;margin-top:10px;min-height:18px;}
 
 .topbar{background:#1a1a1a;border-bottom:.5px solid #2a2a2a;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
-.topbar-logo{font-size:14px;font-weight:600;color:#D4AF37;}
+.topbar-logo{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:#D4AF37;}
 .logout-btn{background:#2a1a1a;border:.5px solid #4a2a2a;color:#e05c5c;border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer;}
 
 .wrap{padding:12px;max-width:1100px;margin:0 auto;padding-bottom:32px;}
@@ -29,12 +29,14 @@ body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,"Segoe UI",sa
 .month-tab{flex-shrink:0;background:#1a1a1a;border:.5px solid #2a2a2a;border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;color:#888;cursor:pointer;white-space:nowrap;}
 .month-tab.active{background:#D4AF37;color:#0d0d0d;border-color:#D4AF37;}
 
+.sync-bar{font-size:11px;color:#555;text-align:right;margin-bottom:8px;min-height:16px;}
+.sync-bar.ok{color:#4caf81;}
+.sync-bar.err{color:#e05c5c;}
+
 .calendars{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
 @media(max-width:700px){.calendars{grid-template-columns:1fr;}}
 
 .cal-card{background:#1a1a1a;border:.5px solid #2a2a2a;border-radius:14px;padding:14px;}
-
-/* HEADER ROW: dot + name input + shift buttons */
 .cal-header{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
 .cal-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
 .cal-name-inp{background:transparent;border:none;border-bottom:1px solid #333;color:#f0f0f0;font-size:16px;font-weight:700;outline:none;width:80px;padding:2px 4px;}
@@ -80,14 +82,32 @@ body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,"Segoe UI",sa
     <button class="logout-btn" onclick="doLogout()">ออกจากระบบ</button>
   </div>
 </div>
-<div id="save-toast" style="display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#4caf81;color:#fff;border-radius:10px;padding:10px 22px;font-size:14px;font-weight:700;z-index:999;box-shadow:0 4px 16px rgba(0,0,0,.4);">✅ บันทึกแล้ว</div>
 
 <div class="wrap">
   <div class="month-tabs" id="month-tabs"></div>
+  <div class="sync-bar" id="sync-bar">กำลังเชื่อมต่อ Firebase...</div>
   <div class="calendars" id="calendars"></div>
 </div>
 
-<script>
+<div id="save-toast" style="display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#4caf81;color:#fff;border-radius:10px;padding:10px 22px;font-size:14px;font-weight:700;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.4);">✅ บันทึกแล้ว</div>
+
+<script type="module">
+import{initializeApp}from'https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js';
+import{getDatabase,ref,set,onValue}from'https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js';
+
+const firebaseConfig={
+  apiKey:"AIzaSyCus5LIZm3VcDV7tWAxI0T4oOr229hWTlM",
+  authDomain:"namchok99dash.firebaseapp.com",
+  databaseURL:"https://namchok99dash-default-rtdb.firebaseio.com",
+  projectId:"namchok99dash",
+  storageBucket:"namchok99dash.firebasestorage.app",
+  messagingSenderId:"168525700910",
+  appId:"1:168525700910:web:7592d9fa28c3dd36b3a4bf"
+};
+
+const app=initializeApp(firebaseConfig);
+const db=getDatabase(app);
+
 const PIN='1234';
 const DEFAULT_STAFF=[
   {key:'fin', name:'ฟิน', color:'#5BE38D'},
@@ -105,16 +125,14 @@ const MONTHS=[
 const DOW=['อา','จ','อ','พ','พฤ','ศ','ส'];
 var curMonth=0;
 
-function lsKey(k,y,m){return'nc_sched_'+k+'_'+y+'_'+m;}
-function shiftKey(k){return'nc_shift_'+k;}
-function nameKey(k){return'nc_name_'+k;}
+// Local state (synced from Firebase)
+var STATE={};
 
-function getOff(k,y,m){try{return JSON.parse(localStorage.getItem(lsKey(k,y,m))||'[]');}catch(e){return[];}}
-function setOff(k,y,m,arr){localStorage.setItem(lsKey(k,y,m),JSON.stringify(arr));}
-function getShift(k){return localStorage.getItem(shiftKey(k))||'';}
-function setShift(k,v){localStorage.setItem(shiftKey(k),v);}
-function getName(s){return localStorage.getItem(nameKey(s.key))||s.name;}
-function saveName(k,v){localStorage.setItem(nameKey(k),v);}
+function fbRef(path){return ref(db,'schedule/'+path);}
+
+function getOff(k,y,m){return(STATE[k]&&STATE[k][y+'_'+m]&&STATE[k][y+'_'+m].off)||[];}
+function getShift(k){return(STATE[k]&&STATE[k].shift)||'';}
+function getName(s){return(STATE[s.key]&&STATE[s.key].name)||s.name;}
 
 function daysInMonth(y,m){return new Date(y,m,0).getDate();}
 function firstDow(y,m){return new Date(y,m-1,1).getDay();}
@@ -129,16 +147,14 @@ function renderCalendar(staff,y,m){
   var displayName=getName(staff);
 
   var html='<div class="cal-card">';
-  // Header: dot + editable name + shift buttons
   html+='<div class="cal-header">';
   html+='<div class="cal-dot" style="background:'+staff.color+'"></div>';
-  html+='<input class="cal-name-inp" value="'+displayName+'" onchange="saveName(\''+staff.key+'\',this.value)" title="แก้ชื่อ"/>';
+  html+='<input class="cal-name-inp" value="'+displayName+'" onchange="window.saveName(\''+staff.key+'\',this.value)" title="แก้ชื่อ"/>';
   html+='<div class="shift-btns">';
-  html+='<button class="shift-btn morning'+(shift==='morning'?' on':'')+'" onclick="toggleShift(\''+staff.key+'\',\'morning\')">เช้า</button>';
-  html+='<button class="shift-btn night'+(shift==='night'?' on':'')+'" onclick="toggleShift(\''+staff.key+'\',\'night\')">ดึก</button>';
+  html+='<button class="shift-btn morning'+(shift==='morning'?' on':'')+'" onclick="window.toggleShift(\''+staff.key+'\',\'morning\')">เช้า</button>';
+  html+='<button class="shift-btn night'+(shift==='night'?' on':'')+'" onclick="window.toggleShift(\''+staff.key+'\',\'night\')">ดึก</button>';
   html+='</div></div>';
 
-  // Calendar grid
   html+='<div class="cal-grid">';
   DOW.forEach(function(d){html+='<div class="cal-dow">'+d+'</div>';});
   for(var i=0;i<fd;i++)html+='<div class="cal-day"></div>';
@@ -146,26 +162,12 @@ function renderCalendar(staff,y,m){
     var dow=(fd+d-1)%7;
     var isOff=off.indexOf(d)!==-1;
     var cls='cal-day active'+(dow===0?' sun':'')+(isOff?' off':'')+(d===todayD?' today-mark':'');
-    html+='<div class="'+cls+'" onclick="toggleDay(\''+staff.key+'\','+y+','+m+','+d+')">'+d+'</div>';
+    html+='<div class="'+cls+'" onclick="window.toggleDay(\''+staff.key+'\','+y+','+m+','+d+')">'+d+'</div>';
   }
   html+='</div>';
   html+='<div class="cal-summary">หยุด <span>'+off.length+'</span> วัน · ทำงาน <span>'+(days-off.length)+'</span> วัน</div>';
   html+='</div>';
   return html;
-}
-
-function toggleDay(k,y,m,d){
-  var off=getOff(k,y,m);
-  var idx=off.indexOf(d);
-  if(idx===-1)off.push(d);else off.splice(idx,1);
-  setOff(k,y,m,off);
-  renderAll();
-}
-
-function toggleShift(k,val){
-  var cur=getShift(k);
-  setShift(k,cur===val?'':val);
-  renderAll();
 }
 
 function renderAll(){
@@ -176,37 +178,83 @@ function renderAll(){
 }
 
 function renderTabs(){
-  var today=new Date();
   var html='';
   MONTHS.forEach(function(mo,i){
-    html+='<div class="month-tab'+(i===curMonth?' active':'')+'" onclick="selectMonth('+i+')">'+mo.label+' '+mo.y+'</div>';
+    html+='<div class="month-tab'+(i===curMonth?' active':'')+'" onclick="window.selectMonth('+i+')">'+mo.label+' '+mo.y+'</div>';
   });
   document.getElementById('month-tabs').innerHTML=html;
 }
 
-function selectMonth(i){curMonth=i;renderTabs();renderAll();}
+function setSyncBar(msg,cls){
+  var el=document.getElementById('sync-bar');
+  el.textContent=msg;el.className='sync-bar'+(cls?' '+cls:'');
+}
 
-function saveAll(){
+// Firebase write helpers
+window.toggleDay=function(k,y,m,d){
+  var off=getOff(k,y,m).slice();
+  var idx=off.indexOf(d);
+  if(idx===-1)off.push(d);else off.splice(idx,1);
+  if(!STATE[k])STATE[k]={};
+  if(!STATE[k][y+'_'+m])STATE[k][y+'_'+m]={};
+  STATE[k][y+'_'+m].off=off;
+  set(fbRef(k+'/'+y+'_'+m+'/off'),off).then(function(){setSyncBar('ซิงค์แล้ว ✓','ok');});
+  renderAll();
+};
+
+window.toggleShift=function(k,val){
+  var cur=getShift(k);
+  var next=cur===val?'':val;
+  if(!STATE[k])STATE[k]={};
+  STATE[k].shift=next;
+  set(fbRef(k+'/shift'),next).then(function(){setSyncBar('ซิงค์แล้ว ✓','ok');});
+  renderAll();
+};
+
+window.saveName=function(k,v){
+  if(!STATE[k])STATE[k]={};
+  STATE[k].name=v;
+  set(fbRef(k+'/name'),v).then(function(){setSyncBar('ซิงค์แล้ว ✓','ok');});
+};
+
+window.selectMonth=function(i){curMonth=i;renderTabs();renderAll();};
+
+window.saveAll=function(){
   var toast=document.getElementById('save-toast');
   toast.style.display='block';
   setTimeout(function(){toast.style.display='none';},2000);
+  setSyncBar('บันทึกแล้ว ✓','ok');
+};
+
+// Listen for realtime updates
+function startSync(){
+  setSyncBar('กำลังซิงค์...');
+  onValue(fbRef(''),function(snap){
+    STATE=snap.val()||{};
+    renderAll();
+    setSyncBar('เชื่อมต่อแล้ว ● Firebase','ok');
+  },function(){
+    setSyncBar('ไม่สามารถเชื่อมต่อ Firebase','err');
+  });
 }
 
-function doLogin(){
+// AUTH
+window.doLogin=function(){
   if(document.getElementById('pin-inp').value===PIN){
     localStorage.setItem('nc_auth','1');
     document.getElementById('login-screen').classList.add('hide');
     init();
   }else{document.getElementById('login-err').textContent='รหัสผิด ลองใหม่';}
-}
-function doLogout(){localStorage.removeItem('nc_auth');location.reload();}
+};
+window.doLogout=function(){localStorage.removeItem('nc_auth');location.reload();};
 
 function init(){
   var today=new Date();
   MONTHS.forEach(function(mo,i){
     if(mo.y===today.getFullYear()&&mo.m===today.getMonth()+1)curMonth=i;
   });
-  renderTabs();renderAll();
+  renderTabs();
+  startSync();
 }
 
 if(localStorage.getItem('nc_auth')==='1'){
