@@ -75,8 +75,12 @@ body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,"Segoe UI",sa
   <a href="/" style="text-decoration:none;">
     <div class="topbar-logo"><img src="logo.png" style="height:32px;width:auto;object-fit:contain;"> ตารางงาน</div>
   </a>
-  <button class="logout-btn" onclick="doLogout()">ออกจากระบบ</button>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <button onclick="saveAll()" style="background:#D4AF37;color:#0d0d0d;border:none;border-radius:8px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer;">💾 บันทึก</button>
+    <button class="logout-btn" onclick="doLogout()">ออกจากระบบ</button>
+  </div>
 </div>
+<div id="save-toast" style="display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#4caf81;color:#fff;border-radius:10px;padding:10px 22px;font-size:14px;font-weight:700;z-index:999;box-shadow:0 4px 16px rgba(0,0,0,.4);">✅ บันทึกแล้ว</div>
 
 <div class="wrap">
   <div class="month-tabs" id="month-tabs"></div>
@@ -181,6 +185,12 @@ function renderTabs(){
 }
 
 function selectMonth(i){curMonth=i;renderTabs();renderAll();}
+
+function saveAll(){
+  var toast=document.getElementById('save-toast');
+  toast.style.display='block';
+  setTimeout(function(){toast.style.display='none';},2000);
+}
 
 function doLogin(){
   if(document.getElementById('pin-inp').value===PIN){
