@@ -133,6 +133,7 @@ body{background:#0d0d0d;color:#f0f0f0;font-family:-apple-system,BlinkMacSystemFo
       <div class="topbar-logo"><img src="logo.png" style="height:32px;width:auto;object-fit:contain;"> ข้อมูลพนักงาน</div>
     </a>
     <div style="display:flex;gap:6px;align-items:center;">
+      <button onclick="window.saveAll()" style="background:#D4AF37;color:#0d0d0d;border:none;border-radius:8px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer;">💾 บันทึก</button>
       <button class="exp-btn" onclick="exportData()" title="Export backup">⬇️</button>
       <button class="exp-btn" onclick="document.getElementById('imp-file').click()" title="Import backup">⬆️</button>
       <input type="file" id="imp-file" accept=".json" onchange="importData(event)">
@@ -379,6 +380,11 @@ function render(){
 // Expose to window for onclick handlers
 window.doLogin=doLogin;
 window.doLogout=doLogout;
+window.saveAll=function(){
+  var d=document.getElementById('save-toast-staff');
+  if(!d){d=document.createElement('div');d.id='save-toast-staff';d.style.cssText='display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#4caf81;color:#fff;border-radius:10px;padding:10px 22px;font-size:14px;font-weight:700;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.4)';d.textContent='✅ บันทึกแล้ว';document.body.appendChild(d);}
+  d.style.display='block';setTimeout(function(){d.style.display='none';},2000);
+};
 window.addStaff=addStaff;
 window.deleteStaff=deleteStaff;
 window.openEdit=openEdit;
