@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>NAMCHOK99 — Dashboard ลูกค้าใหม่</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#0d0d0d;color:#f0f0f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;}
+/* LOGIN */
+#login-screen{position:fixed;inset:0;background:#0d0d0d;z-index:999;display:none;align-items:center;justify-content:center;padding:20px;}
+#login-screen.show{display:flex;}
+.login-box{background:#1a1a1a;border:.5px solid #2a2a2a;border-radius:16px;padding:28px 24px;width:100%;max-width:360px;}
+.login-logo{font-size:18px;font-weight:600;color:#D4AF37;text-align:center;margin-bottom:4px;}
+.login-sub{font-size:11px;color:#555;text-align:center;margin-bottom:24px;}
+.login-lbl{font-size:11px;color:#888;margin-bottom:5px;}
+.login-inp{width:100%;background:#111;border:.5px solid #2a2a2a;color:#f0f0f0;border-radius:8px;padding:10px 12px;font-size:14px;margin-bottom:14px;}
+.login-inp:focus{outline:none;border-color:#D4AF37;}
+.login-btn{width:100%;background:#D4AF37;color:#0d0d0d;border:none;border-radius:8px;padding:11px;font-size:14px;font-weight:600;cursor:pointer;margin-top:4px;}
+.login-btn:active{opacity:.85;}
+.login-err{font-size:12px;color:#e05c5c;text-align:center;margin-top:10px;min-height:18px;}
+.dk{background:#111;max-width:430px;margin:0 auto;min-height:100vh;}
+.topbar{background:#1a1a1a;border-bottom:.5px solid #2a2a2a;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.logo{font-size:14px;font-weight:500;color:#D4AF37;}
+.tbr{display:flex;align-items:center;gap:7px;}
+.save-btn{background:#1a2a1a;border:.5px solid #2a4a2a;color:#4caf81;border-radius:8px;padding:6px 11px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px;}
+.save-btn:active{opacity:.7;}
+.clear-btn{background:#2a1a1a;border:.5px solid #4a2a2a;color:#e05c5c;border-radius:8px;padding:6px 9px;font-size:12px;cursor:pointer;}
+.est-btn{background:#1a1800;border:.5px solid #3a3000;color:#D4AF37;border-radius:8px;padding:6px 9px;font-size:12px;cursor:pointer;white-space:nowrap;}
+.est-btn:active{opacity:.7;}
+.month-btn{background:#1a1a1a;border:.5px solid #2a2a2a;color:#D4AF37;border-radius:8px;padding:7px 12px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px;width:100%;justify-content:space-between;}
+.month-dropdown{position:absolute;top:calc(100% + 4px);left:0;right:0;background:#1e1e1e;border:.5px solid #2a2a2a;border-radius:10px;z-index:100;overflow:hidden;display:none;box-shadow:0 8px 24px rgba(0,0,0,.7);}
+.month-dropdown.open{display:block;}
+.month-option{padding:11px 16px;font-size:13px;color:#ccc;cursor:pointer;border-bottom:.5px solid #2a2a2a;}
+.month-option:last-child{border-bottom:none;}
+.month-option.active,.month-option:active{background:#252525;color:#D4AF37;}
+.mwrap{position:relative;padding:10px 16px 0;}
+.save-status{display:flex;align-items:center;gap:5px;padding:5px 16px 0;font-size:11px;color:#666;}
+.sdot{width:6px;height:6px;border-radius:50%;background:#D4AF37;flex-shrink:0;}
+.body{padding:12px 16px;display:flex;flex-direction:column;gap:12px;}
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+.mc{background:#1a1a1a;border:.5px solid #2a2a2a;border-radius:12px;padding:11px 13px;}
+.mlbl{font-size:10px;color:#888;margin-bottom:3px;}
+.mv{font-size:18px;font-weight:500;color:#f0f0f0;}
+.mv.gold{color:#D4AF37;}.mv.green{color:#4caf81;}
+.ms{font-size:10px;margin-top:2px;color:#888;}
+.card{background:#1a1a1a;border:.5px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:8px;}
+.sec{font-size:11px;color:#888;margin-bottom:8px;display:flex;align-items:center;gap:5px;}
+.tab-row{display:flex;gap:1px;background:#222;}
+.tab{flex:1;padding:9px 6px;font-size:11px;color:#888;text-align:center;cursor:pointer;background:#1a1a1a;}
+.tab.active{color:#D4AF37;border-bottom:2px solid #D4AF37;}
+.chart-area{padding:12px 14px;}
+.donut-row{display:flex;align-items:center;gap:12px;}
+.legend{display:flex;flex-direction:column;gap:6px;flex:1;}
+.li{display:flex;align-items:center;gap:6px;}
+.ld{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.ln{font-size:11px;color:#bbb;flex:1;}
+.lv{font-size:12px;font-weight:500;}
+.lp{font-size:10px;color:#888;min-width:26px;text-align:right;}
+.tbox{background:#111;border-radius:8px;padding:7px 11px;margin-top:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;}
+.tbox-item{display:flex;flex-direction:column;align-items:center;gap:1px;}
+.tbox-lbl{font-size:9px;color:#666;}
+.tbox-val{font-size:14px;font-weight:500;color:#D4AF37;}
+.bar-section{display:flex;flex-direction:column;gap:8px;}
+.br{display:flex;flex-direction:column;gap:3px;}
+.blr{display:flex;justify-content:space-between;font-size:11px;}
+.bn{color:#bbb;}.bv{color:#f0f0f0;font-weight:500;}.bp{color:#888;font-size:10px;margin-left:3px;}
+.btrack{height:7px;background:#222;border-radius:4px;overflow:hidden;}
+.bfill{height:100%;border-radius:4px;}
+.ch-header{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;cursor:pointer;user-select:none;}
+.ch-header:active{background:#1d1d1d;}
+.ch-left{display:flex;align-items:center;gap:7px;flex:1;min-width:0;}
+.cdot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.cname{font-size:13px;font-weight:500;}
+.cbadge{font-size:10px;color:#888;background:#222;border-radius:20px;padding:2px 7px;margin-left:3px;}
+.ch-right{display:flex;align-items:center;gap:9px;flex-shrink:0;}
+.hs{display:flex;flex-direction:column;align-items:flex-end;}
+.hsl{font-size:9px;color:#666;}
+.hsv{font-size:12px;font-weight:500;}
+.gold{color:#D4AF37;}.green{color:#4caf81;}.muted{color:#888;}
+.tog{font-size:13px;color:#444;transition:transform .2s;}
+.tog.open{transform:rotate(180deg);}
+.ch-body{display:none;border-top:.5px solid #1e1e1e;background:#161616;}
+.ch-body.open{display:block;}
+.sg2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:#222;}
+.sc{background:#161616;padding:9px 11px;}
+.scl{font-size:10px;color:#666;margin-bottom:2px;}
+.si{background:#1a1a1a;border:.5px solid #2a2a2a;color:#f0f0f0;border-radius:6px;padding:5px 7px;font-size:14px;width:100%;margin-top:3px;}
+.si:focus{outline:none;border-color:#D4AF37;}
+.scs{font-size:10px;color:#555;margin-top:2px;}
+.bsec{padding:9px 13px;border-top:.5px solid #1e1e1e;}
+.bstitle{font-size:10px;color:#666;margin-bottom:7px;}
+.srow{display:grid;grid-template-columns:1fr 95px 24px;align-items:center;gap:5px;margin-bottom:5px;}
+.sl2{font-size:12px;color:#bbb;}
+.sub-inp{background:#1a1a1a;border:.5px solid #2a2a2a;color:#f0f0f0;border-radius:6px;padding:4px 7px;font-size:12px;text-align:right;width:100%;}
+.sub-inp:focus{outline:none;border-color:#D4AF37;}
+.dbtn{background:none;border:none;color:#444;cursor:pointer;font-size:12px;padding:2px;}
+.dbtn:active{color:#e05c5c;}
+.addrow{display:flex;gap:5px;margin-top:5px;}
+.addinp{flex:1;background:#1a1a1a;border:.5px dashed #2a2a2a;color:#ccc;border-radius:6px;padding:4px 7px;font-size:12px;}
+.addinp:focus{outline:none;border-color:#555;}
+.addbtn{background:#1e1e1e;border:.5px solid #2a2a2a;color:#888;border-radius:6px;padding:4px 9px;font-size:12px;cursor:pointer;white-space:nowrap;}
+.addbtn:active{color:#D4AF37;}
+.chsum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:#222;border-top:.5px solid #1e1e1e;}
+.cscel{background:#161616;padding:7px 10px;text-align:center;}
+.csl{font-size:9px;color:#666;}
+.csv{font-size:13px;font-weight:500;margin-top:1px;}
+.grand{background:#1a1a1a;border:.5px solid #2a2a2a;border-radius:12px;padding:11px 13px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;}
+.gi{display:flex;flex-direction:column;gap:2px;}
+.gl{font-size:10px;color:#666;}
+.gv{font-size:15px;font-weight:500;color:#D4AF37;}
+table{width:100%;border-collapse:collapse;font-size:11px;}
+th{color:#666;font-weight:400;font-size:10px;padding:6px 7px;text-align:left;border-bottom:.5px solid #222;}
+td{padding:7px 7px;border-bottom:.5px solid #1a1a1a;color:#bbb;}
+td.r{text-align:right;color:#f0f0f0;font-weight:500;}
+td.g{text-align:right;color:#D4AF37;font-weight:500;}
+td.up{text-align:right;color:#4caf81;font-weight:500;}
+</style>
+</head>
+<body>
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo"><img src="logo.png" style="height:110px;width:auto;object-fit:contain;display:block;margin:0 auto 10px;"></div>
+    <div class="login-sub">Dashboard ลูกค้าใหม่ — เข้าสู่ระบบ</div>
+    <div class="login-lbl">Username</div>
+    <input class="login-inp" type="text" id="l-user" placeholder="username" autocomplete="username">
+    <div class="login-lbl">Password</div>
+    <input class="login-inp" type="password" id="l-pass" placeholder="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">เข้าสู่ระบบ</button>
+    <div class="login-err" id="l-err"></div>
+  </div>
+</div>
+
+<div class="dk">
+<div class="topbar">
+  <a href="/" style="text-decoration:none;"><span class="logo"><img src="logo.png" style="height:32px;width:auto;object-fit:contain;"> NAMCHOK99 — ลูกค้าใหม่</span></a>
+  <div class="tbr">
+    <button class="est-btn" onclick="loadEstimate()"><i class="ti ti-calculator"></i> est.</button>
+    <button class="save-btn" onclick="saveData()"><i class="ti ti-device-floppy"></i> บันทึก</button>
+    <button class="clear-btn" onclick="clearData()">🗑</button>
+    <button class="clear-btn" onclick="doLogout()">🚪</button>
+  </div>
+</div>
+
+<div class="mwrap">
+  <button class="month-btn" onclick="toggleMD()">
+    <span id="mbtxt"><i class="ti ti-calendar"></i> —</span>
+    <i class="ti ti-chevron-down" id="mbico"></i>
+  </button>
+  <div class="month-dropdown" id="mdd"></div>
+</div>
+<div class="save-status"><span class="sdot" id="sdot"></span><span id="stxt">ใส่ตัวอย่าง estimate งบ ฿200,000</span></div>
+
+<div class="body">
+  <div class="g2">
+    <div class="mc"><div class="mlbl">สมาชิกใหม่</div><div class="mv" id="g-reg">0</div><div class="ms" id="g-rsub">—</div></div>
+    <div class="mc"><div class="mlbl">ฝากเงินแล้ว</div><div class="mv green" id="g-dep">0</div><div class="ms" id="g-dsub">—</div></div>
+    <div class="mc"><div class="mlbl">ยอดฝากแรกรวม</div><div class="mv gold" id="g-first">฿0</div><div class="ms" id="g-fsub">เฉลี่ย —</div></div>
+    <div class="mc"><div class="mlbl">ยอดฝากรวม</div><div class="mv gold" id="g-tot">฿0</div><div class="ms" id="g-tsub">ROI —</div></div>
+  </div>
+
+  <div class="card">
+    <div class="tab-row">
+      <div class="tab active" id="tab-dep" onclick="showTab('dep')"><i class="ti ti-currency-baht"></i> ยอดฝากรวม</div>
+      <div class="tab" id="tab-fst" onclick="showTab('fst')"><i class="ti ti-currency-baht"></i> ยอดฝากแรก</div>
+      <div class="tab" id="tab-mem" onclick="showTab('mem')"><i class="ti ti-users"></i> สมาชิก</div>
+    </div>
+    <div class="chart-area" id="pane-dep">
+      <div class="sec"><i class="ti ti-chart-donut"></i> ยอดฝากรวม แยกช่องทาง</div>
+      <div class="donut-row">
+        <div style="position:relative;width:105px;height:105px;flex-shrink:0;">
+          <canvas id="ch-dep" style="width:105px;height:105px;"></canvas>
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;">
+            <div style="font-size:9px;color:#888;">รวม</div>
+            <div style="font-size:12px;font-weight:500;color:#D4AF37;" id="dep-center">฿0</div>
+          </div>
+        </div>
+        <div class="legend" id="dep-legend"></div>
+      </div>
+      <div class="tbox">
+        <div class="tbox-item"><div class="tbox-lbl">ยอดฝากรวม</div><div class="tbox-val" id="tbox-dep">฿0</div></div>
+        <div class="tbox-item"><div class="tbox-lbl">ROI รวม</div><div class="tbox-val" style="color:#4caf81" id="tbox-roi">—</div></div>
+      </div>
+    </div>
+    <div class="chart-area" id="pane-fst" style="display:none;">
+      <div class="sec"><i class="ti ti-chart-donut"></i> ยอดฝากแรก แยกช่องทาง</div>
+      <div class="donut-row">
+        <div style="position:relative;width:105px;height:105px;flex-shrink:0;">
+          <canvas id="ch-fst" style="width:105px;height:105px;"></canvas>
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;">
+            <div style="font-size:9px;color:#888;">รวม</div>
+            <div style="font-size:12px;font-weight:500;color:#D4AF37;" id="fst-center">฿0</div>
+          </div>
+        </div>
+        <div class="legend" id="fst-legend"></div>
+      </div>
+      <div class="tbox">
+        <div class="tbox-item"><div class="tbox-lbl">ยอดฝากแรกรวม</div><div class="tbox-val" id="tbox-fst">฿0</div></div>
+        <div class="tbox-item"><div class="tbox-lbl">เฉลี่ย/คน</div><div class="tbox-val" style="color:#4caf81" id="tbox-avg">—</div></div>
+      </div>
+    </div>
+    <div class="chart-area" id="pane-mem" style="display:none;">
+      <div class="sec"><i class="ti ti-users"></i> สมาชิกใหม่ แยกช่องทาง</div>
+      <div class="bar-section" id="mem-bars"></div>
+      <div class="tbox" style="margin-top:10px;">
+        <div class="tbox-item"><div class="tbox-lbl">สมาชิกใหม่รวม</div><div class="tbox-val" id="tbox-reg">0 คน</div></div>
+        <div class="tbox-item"><div class="tbox-lbl">ฝากแล้ว</div><div class="tbox-val" style="color:#4caf81" id="tbox-dep2">0 คน</div></div>
+      </div>
+      <div style="padding:8px 0 0;display:flex;align-items:center;gap:8px;">
+        <div style="font-size:10px;color:#666;white-space:nowrap;">สมาชิกเก่า (active)</div>
+        <input class="si" type="number" id="old-members" placeholder="0" min="0" style="font-size:13px;padding:4px 8px;" oninput="recalc();markUnsaved()">
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="sec"><i class="ti ti-adjustments"></i> รายละเอียดแต่ละช่องทาง</div>
+    <div id="channels-wrap"></div>
+  </div>
+
+  <div class="grand">
+    <div class="gi"><div class="gl">งบรวมทั้งหมด</div><div class="gv" id="gr-bud">฿0</div></div>
+    <div class="gi"><div class="gl">CPA เฉลี่ย</div><div class="gv" id="gr-cpa">—</div></div>
+    <div class="gi"><div class="gl">อัตราฝาก</div><div class="gv" id="gr-rate">—</div></div>
+    <div class="gi"><div class="gl">ROI รวม</div><div class="gv" id="gr-roi">—</div></div>
+  </div>
+
+  <div class="card" style="padding:12px 13px;">
+    <div class="sec"><i class="ti ti-list"></i> ตารางสรุป</div>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead><tr>
+          <th>ช่องทาง</th><th style="text-align:right">สมัคร</th><th style="text-align:right">ฝาก</th>
+          <th style="text-align:right">ยอดแรก</th><th style="text-align:right">ยอดรวม</th>
+          <th style="text-align:right">งบ</th><th style="text-align:right">ROI</th>
+        </tr></thead>
+        <tbody id="tbl-body"><tr><td colspan="7" style="text-align:center;color:#444;padding:14px">กำลังโหลด...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div style="padding:16px 0 8px;text-align:center;font-size:10px;color:#333;">NAMCHOK99 Dashboard v1.0</div>
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const CH=[
+  {id:'fb',name:'Facebook',color:'#1877f2',badge:'#0a1f3a',btxt:'#5b9bd5'},
+  {id:'line',name:'Line OA',color:'#06c755',badge:'#0a2a15',btxt:'#4caf81'},
+  {id:'tt',name:'TikTok',color:'#ff0050',badge:'#2a0a15',btxt:'#e05c5c'},
+  {id:'inf',name:'จัดจ้าง อินฟลู',color:'#a855f7',badge:'#1e0a2a',btxt:'#c084fc'},
+  {id:'ref',name:'แนะนำเพื่อน',color:'#D4AF37',badge:'#2a2a1a',btxt:'#D4AF37'},
+];
+
+const ESTIMATE={
+  oldMembers:1000,
+  channels:{
+    fb:{reg:180,dep:108,first:270000,totdep:810000,items:[{l:'ซื้อเพจ',v:5000},{l:'ซื้อเฟส (account)',v:15000},{l:'ยิง Ads',v:50000}]},
+    line:{reg:60,dep:42,first:105000,totdep:315000,items:[{l:'ค่า Line OA รายเดือน',v:5000},{l:'ค่าโปรโมท',v:15000}]},
+    tt:{reg:120,dep:60,first:150000,totdep:450000,items:[{l:'ซื้อช่อง TikTok',v:10000},{l:'ยิงแอด',v:40000}]},
+    inf:{reg:90,dep:54,first:135000,totdep:405000,items:[{l:'ค่าจ้างอินฟลูเอนเซอร์',v:30000},{l:'ค่าโปรโมทโพสต์',v:10000},{l:'ค่าคอนเทนต์',v:5000}]},
+    ref:{reg:50,dep:40,first:100000,totdep:300000,items:[{l:'AFF (Affiliate)',v:15000}]},
+  }
+};
+
+const MONTHS=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+let curMonth=new Date().getMonth();
+const curYear=2026;
+let charts={dep:null,fst:null};
+
+function fmt(n){return Math.round(n).toLocaleString();}
+function fmtK(n){return n>=1000000?(n/1000000).toFixed(1)+'M':n>=1000?(n/1000).toFixed(0)+'K':fmt(n);}
+function pct(a,b){return b>0?Math.round(a/b*100)+'%':'—';}
+function gv(id){return parseFloat(document.getElementById(id)?.value)||0;}
+function skey(m){return`namchok99_v2_${curYear}_${m}`;}
+
+function buildMD(){
+  const dd=document.getElementById('mdd');dd.innerHTML='';
+  MONTHS.forEach((m,i)=>{
+    const o=document.createElement('div');
+    o.className='month-option'+(i===curMonth?' active':'');
+    o.textContent=m+' '+curYear;
+    o.onclick=()=>{curMonth=i;toggleMD();updateML();buildMD();loadData();};
+    dd.appendChild(o);
+  });
+}
+function toggleMD(){
+  const dd=document.getElementById('mdd'),ico=document.getElementById('mbico');
+  dd.classList.toggle('open');
+  ico.style.transform=dd.classList.contains('open')?'rotate(180deg)':'';
+}
+function updateML(){
+  document.getElementById('mbtxt').innerHTML=`<i class="ti ti-calendar"></i> ${MONTHS[curMonth]} ${curYear}`;
+}
+document.addEventListener('click',e=>{if(!e.target.closest('.mwrap'))document.getElementById('mdd').classList.remove('open');});
+
+function initCharts(){
+  ['dep','fst'].forEach(k=>{
+    if(charts[k])charts[k].destroy();
+    charts[k]=new Chart(document.getElementById('ch-'+k),{
+      type:'doughnut',
+      data:{labels:CH.map(c=>c.name),datasets:[{data:CH.map(()=>1),backgroundColor:CH.map(c=>c.color),borderWidth:0,hoverOffset:3}]},
+      options:{responsive:false,cutout:'68%',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+ctx.label+': ฿'+ctx.parsed.toLocaleString()}}}}
+    });
+  });
+}
+
+function updateCharts(depData,fstData,totDep,totFst,totDep2){
+  if(charts.dep){charts.dep.data.datasets[0].data=depData.map(v=>v||0.01);charts.dep.update();}
+  if(charts.fst){charts.fst.data.datasets[0].data=fstData.map(v=>v||0.01);charts.fst.update();}
+  document.getElementById('dep-center').textContent=fmtK(totDep);
+  document.getElementById('fst-center').textContent=fmtK(totFst);
+  document.getElementById('tbox-dep').textContent='฿'+fmt(totDep);
+  document.getElementById('tbox-fst').textContent='฿'+fmt(totFst);
+  const bud=CH.reduce((s,c)=>s+getBudget(c.id),0);
+  document.getElementById('tbox-roi').textContent=bud>0&&totDep>0?Math.round(totDep/bud)+'x':'—';
+  document.getElementById('tbox-avg').textContent=totDep2>0?'฿'+fmt(totFst/totDep2):'—';
+  const depLeg=document.getElementById('dep-legend');
+  const fstLeg=document.getElementById('fst-legend');
+  depLeg.innerHTML='';fstLeg.innerHTML='';
+  CH.forEach((c,i)=>{
+    const dp=totDep>0?Math.round(depData[i]/totDep*100):0;
+    const fp=totFst>0?Math.round(fstData[i]/totFst*100):0;
+    depLeg.innerHTML+=`<div class="li"><div class="ld" style="background:${c.color}"></div><div class="ln">${c.name}</div><div class="lv" style="color:${c.color}">${fmtK(depData[i])}</div><div class="lp">${dp}%</div></div>`;
+    fstLeg.innerHTML+=`<div class="li"><div class="ld" style="background:${c.color}"></div><div class="ln">${c.name}</div><div class="lv" style="color:${c.color}">${fmtK(fstData[i])}</div><div class="lp">${fp}%</div></div>`;
+  });
+}
+
+function updateMemBars(regData,totReg){
+  const wrap=document.getElementById('mem-bars');wrap.innerHTML='';
+  CH.forEach((c,i)=>{
+    const w=totReg>0?Math.round(regData[i]/totReg*100):0;
+    wrap.innerHTML+=`<div class="br"><div class="blr"><span class="bn">${c.name}</span><span class="bv">${fmt(regData[i])} คน<span class="bp">${w}%</span></span></div><div class="btrack"><div class="bfill" style="width:${w}%;background:${c.color}"></div></div></div>`;
+  });
+}
+
+function getBudget(id){
+  let s=0;document.querySelectorAll(`#items-${id} .sub-inp`).forEach(i=>s+=parseFloat(i.value)||0);return s;
+}
+
+function buildChannels(data){
+  const wrap=document.getElementById('channels-wrap');wrap.innerHTML='';
+  CH.forEach(ch=>{
+    const d=data?.channels?.[ch.id]||{reg:0,dep:0,first:0,totdep:0,items:[]};
+    const itemsHTML=(d.items||[]).map((it,i)=>`
+      <div class="srow" id="ir-${ch.id}-${i}">
+        <div class="sl2">${it.l}</div>
+        <input class="sub-inp" type="number" value="${it.v||''}" placeholder="0" min="0" id="bi-${ch.id}-${i}" oninput="recalc();markUnsaved()">
+        <button class="dbtn" onclick="delItem('${ch.id}',${i})"><i class="ti ti-x"></i></button>
+      </div>`).join('');
+    const bud=(d.items||[]).reduce((s,it)=>s+(it.v||0),0);
+    wrap.innerHTML+=`
+    <div class="card">
+      <div class="ch-header" onclick="toggle('${ch.id}')">
+        <div class="ch-left">
+          <div class="cdot" style="background:${ch.color}"></div>
+          <div class="cname">${ch.name}<span class="cbadge" id="bdg-${ch.id}">${d.reg||0} คน</span></div>
+        </div>
+        <div class="ch-right">
+          <div class="hs"><div class="hsl">ยอดรวม</div><div class="hsv gold" id="h-tot-${ch.id}">฿${fmtK(d.totdep||0)}</div></div>
+          <div class="hs"><div class="hsl">งบ</div><div class="hsv muted" id="h-bud-${ch.id}">฿${fmtK(bud)}</div></div>
+          <i class="ti ti-chevron-down tog" id="tog-${ch.id}"></i>
+        </div>
+      </div>
+      <div class="ch-body" id="body-${ch.id}">
+        <div class="sg2">
+          <div class="sc"><div class="scl">สมัคร (คน)</div><input class="si" type="number" id="reg-${ch.id}" value="${d.reg||''}" placeholder="0" min="0" oninput="recalc();markUnsaved()"></div>
+          <div class="sc"><div class="scl">ฝากเงินแล้ว (คน)</div><input class="si" type="number" id="dep-${ch.id}" value="${d.dep||''}" placeholder="0" min="0" oninput="recalc();markUnsaved()"><div class="scs" id="rate-${ch.id}">อัตราฝาก ${pct(d.dep,d.reg)}</div></div>
+          <div class="sc"><div class="scl">ยอดฝากแรก (฿)</div><input class="si" type="number" id="first-${ch.id}" value="${d.first||''}" placeholder="0" min="0" oninput="recalc();markUnsaved()"><div class="scs" id="avg-f-${ch.id}">${d.dep>0?'เฉลี่ย ฿'+fmt(d.first/d.dep):'เฉลี่ย —'}</div></div>
+          <div class="sc"><div class="scl">ยอดฝากรวม (฿)</div><input class="si" type="number" id="totd-${ch.id}" value="${d.totdep||''}" placeholder="0" min="0" oninput="recalc();markUnsaved()"><div class="scs" id="avg-t-${ch.id}">${d.dep>0?'เฉลี่ย ฿'+fmt(d.totdep/d.dep):'เฉลี่ย —'}</div></div>
+        </div>
+        <div class="bsec">
+          <div class="bstitle"><i class="ti ti-wallet"></i> รายละเอียดค่าใช้จ่าย</div>
+          <div id="items-${ch.id}">${itemsHTML}</div>
+          <div class="addrow">
+            <input class="addinp" type="text" placeholder="+ เพิ่มรายการ..." id="al-${ch.id}">
+            <button class="addbtn" onclick="addItem('${ch.id}')"><i class="ti ti-plus"></i> เพิ่ม</button>
+          </div>
+        </div>
+        <div class="chsum">
+          <div class="cscel"><div class="csl">งบรวม</div><div class="csv gold" id="s-bud-${ch.id}">฿${fmtK(bud)}</div></div>
+          <div class="cscel"><div class="csl">CPA</div><div class="csv" id="s-cpa-${ch.id}">${bud>0&&d.reg>0?'฿'+fmt(bud/d.reg):'—'}</div></div>
+          <div class="cscel"><div class="csl">ROI</div><div class="csv green" id="s-roi-${ch.id}">${bud>0&&d.totdep>0?Math.round(d.totdep/bud)+'x':'—'}</div></div>
+        </div>
+      </div>
+    </div>`;
+  });
+}
+
+function toggle(id){
+  document.getElementById('body-'+id).classList.toggle('open');
+  document.getElementById('tog-'+id).classList.toggle('open');
+}
+
+function recalc(){
+  let gR=0,gD=0,gF=0,gT=0,gB=0;
+  const depData=[],fstData=[],regData=[],rows=[];
+  CH.forEach(ch=>{
+    const id=ch.id;
+    const reg=gv('reg-'+id),dep=gv('dep-'+id),first=gv('first-'+id),tot=gv('totd-'+id),bud=getBudget(id);
+    gR+=reg;gD+=dep;gF+=first;gT+=tot;gB+=bud;
+    depData.push(tot);fstData.push(first);regData.push(reg);
+    document.getElementById('bdg-'+id).textContent=(reg||0)+' คน';
+    document.getElementById('h-tot-'+id).textContent='฿'+fmtK(tot);
+    document.getElementById('h-bud-'+id).textContent='฿'+fmtK(bud);
+    document.getElementById('rate-'+id).textContent='อัตราฝาก '+pct(dep,reg);
+    document.getElementById('avg-f-'+id).textContent=dep>0?'เฉลี่ย ฿'+fmt(first/dep):'เฉลี่ย —';
+    document.getElementById('avg-t-'+id).textContent=dep>0?'เฉลี่ย ฿'+fmt(tot/dep):'เฉลี่ย —';
+    document.getElementById('s-bud-'+id).textContent='฿'+fmtK(bud);
+    document.getElementById('s-cpa-'+id).textContent=bud>0&&reg>0?'฿'+fmt(bud/reg):'—';
+    document.getElementById('s-roi-'+id).textContent=bud>0&&tot>0?Math.round(tot/bud)+'x':'—';
+    if(reg>0||dep>0||bud>0)rows.push({ch,reg,dep,first,tot,bud});
+  });
+  updateCharts(depData,fstData,gT,gF,gD);
+  updateMemBars(regData,gR);
+  document.getElementById('g-reg').textContent=fmt(gR);
+  document.getElementById('g-rsub').textContent=gR>0?'ทุกช่องทาง':'—';
+  document.getElementById('g-dep').textContent=fmt(gD);
+  document.getElementById('g-dsub').textContent=gR>0?'อัตราฝาก '+pct(gD,gR):'—';
+  document.getElementById('g-first').textContent='฿'+fmt(gF);
+  document.getElementById('g-fsub').textContent=gD>0?'เฉลี่ย ฿'+fmt(gF/gD):'เฉลี่ย —';
+  document.getElementById('g-tot').textContent='฿'+fmt(gT);
+  document.getElementById('g-tsub').textContent=gB>0&&gT>0?'ROI '+Math.round(gT/gB)+'x':'ROI —';
+  document.getElementById('gr-bud').textContent='฿'+fmt(gB);
+  document.getElementById('gr-cpa').textContent=gB>0&&gR>0?'฿'+fmt(gB/gR):'—';
+  document.getElementById('gr-rate').textContent=pct(gD,gR);
+  document.getElementById('gr-roi').textContent=gB>0&&gT>0?Math.round(gT/gB)+'x':'—';
+  document.getElementById('tbox-reg').textContent=fmt(gR)+' คน';
+  document.getElementById('tbox-dep2').textContent=fmt(gD)+' คน ('+pct(gD,gR)+')';
+  const tbody=document.getElementById('tbl-body');
+  if(!rows.length){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:#444;padding:14px">ยังไม่มีข้อมูลครับ</td></tr>';return;}
+  let html='';
+  rows.forEach(({ch,reg,dep,first,tot,bud})=>{
+    html+=`<tr><td><span style="display:inline-block;padding:1px 6px;border-radius:20px;font-size:10px;background:${ch.badge};color:${ch.btxt}">${ch.name}</span></td>
+    <td class="r">${fmt(reg)}</td><td class="r">${fmt(dep)}</td>
+    <td class="g">฿${fmt(first)}</td><td class="g">฿${fmt(tot)}</td>
+    <td class="r" style="color:#e05c5c">฿${fmt(bud)}</td>
+    <td class="up">${bud>0&&tot>0?Math.round(tot/bud)+'x':'—'}</td></tr>`;
+  });
+  if(rows.length>1)html+=`<tr style="border-top:.5px solid #333"><td style="color:#666;font-size:10px">รวม</td>
+    <td class="r">${fmt(gR)}</td><td class="r">${fmt(gD)}</td>
+    <td class="g">฿${fmt(gF)}</td><td class="g">฿${fmt(gT)}</td>
+    <td class="r" style="color:#e05c5c">฿${fmt(gB)}</td>
+    <td class="up">${gB>0&&gT>0?Math.round(gT/gB)+'x':'—'}</td></tr>`;
+  tbody.innerHTML=html;
+}
+
+function showTab(name){
+  ['dep','fst','mem'].forEach(t=>{
+    document.getElementById('pane-'+t).style.display=t===name?'block':'none';
+    document.getElementById('tab-'+t).className='tab'+(t===name?' active':'');
+  });
+}
+
+function collectData(){
+  const d={oldM:gv('old-members'),channels:{}};
+  CH.forEach(ch=>{
+    const id=ch.id;const items=[];
+    document.querySelectorAll(`#items-${id} .srow`).forEach(row=>{
+      const l=row.querySelector('.sl2')?.textContent||'';
+      const v=parseFloat(row.querySelector('.sub-inp')?.value)||0;
+      items.push({l,v});
+    });
+    d.channels[id]={reg:gv('reg-'+id),dep:gv('dep-'+id),first:gv('first-'+id),totdep:gv('totd-'+id),items};
+  });
+  return d;
+}
+
+function saveData(){
+  localStorage.setItem(skey(curMonth),JSON.stringify(collectData()));
+  document.getElementById('sdot').style.background='#4caf81';
+  document.getElementById('stxt').textContent='บันทึกแล้ว '+new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
+}
+
+function markUnsaved(){
+  document.getElementById('sdot').style.background='#D4AF37';
+  document.getElementById('stxt').textContent='มีการแก้ไข — กด บันทึก';
+}
+
+function loadEstimate(){
+  buildChannels(ESTIMATE);
+  if(document.getElementById('old-members'))document.getElementById('old-members').value=ESTIMATE.oldMembers;
+  recalc();
+  document.getElementById('sdot').style.background='#D4AF37';
+  document.getElementById('stxt').textContent='ใส่ตัวอย่าง estimate งบ ฿200,000 — กด บันทึก ถ้าต้องการเก็บ';
+}
+
+function loadData(){
+  const raw=localStorage.getItem(skey(curMonth));
+  if(!raw){
+    if(curMonth===5){loadEstimate();}
+    else{buildChannels({});recalc();
+      document.getElementById('sdot').style.background='#555';
+      document.getElementById('stxt').textContent='ยังไม่มีข้อมูล — พร้อมบันทึกข้อมูลใหม่';
+    }
+    return;
+  }
+  const data=JSON.parse(raw);
+  buildChannels(data);
+  if(document.getElementById('old-members'))document.getElementById('old-members').value=data.oldM||'';
+  recalc();
+  document.getElementById('sdot').style.background='#4caf81';
+  document.getElementById('stxt').textContent='โหลดข้อมูลที่บันทึกไว้แล้ว';
+}
+
+function clearData(){
+  if(!confirm('ลบข้อมูลเดือน '+MONTHS[curMonth]+' '+curYear+'?'))return;
+  localStorage.removeItem(skey(curMonth));
+  loadEstimate();
+}
+
+function addItem(id){
+  const inp=document.getElementById('al-'+id);
+  const label=inp.value.trim();if(!label)return;
+  const wrap=document.getElementById('items-'+id);const i=wrap.children.length;
+  const row=document.createElement('div');row.className='srow';row.id=`ir-${id}-${i}`;
+  row.innerHTML=`<div class="sl2">${label}</div><input class="sub-inp" type="number" placeholder="0" min="0" id="bi-${id}-${i}" oninput="recalc();markUnsaved()"><button class="dbtn" onclick="delItem('${id}',${i})"><i class="ti ti-x"></i></button>`;
+  wrap.appendChild(row);inp.value='';markUnsaved();
+}
+
+function delItem(id,i){
+  const row=document.getElementById(`ir-${id}-${i}`);
+  if(row){row.remove();recalc();markUnsaved();}
+}
+
+// ---- LOGIN ----
+const USERS=[
+  {user:'admin',pass:'namchok99'},
+  {user:'manager',pass:'nc2026'},
+];
+function doLogin(){
+  const u=document.getElementById('l-user').value.trim();
+  const p=document.getElementById('l-pass').value;
+  const ok=USERS.find(x=>x.user===u&&x.pass===p);
+  if(ok){
+    sessionStorage.setItem('nc_auth','1');
+    document.getElementById('login-screen').classList.remove('show');
+  } else {
+    document.getElementById('l-err').textContent='Username หรือ Password ไม่ถูกต้อง';
+    document.getElementById('l-pass').value='';
+  }
+}
+if(sessionStorage.getItem('nc_auth')!=='1'){
+  document.getElementById('login-screen').classList.add('show');
+}
+function doLogout(){
+  sessionStorage.removeItem('nc_auth');
+  document.getElementById('login-screen').classList.add('show');
+}
+
+initCharts();
+buildMD();
+updateML();
+loadData();
+</script>
+</body>
+</html>

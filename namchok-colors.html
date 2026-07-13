@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NAMCHOK99 — Color & Style Guide</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#090909;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;padding:0 0 40px;}
+.topbar{background:#101010;border-bottom:1px solid rgba(212,175,55,0.2);padding:14px 20px;position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;}
+.logo{color:#D4AF37;font-size:14px;font-weight:500;}
+.version{font-size:11px;color:#555;}
+.body{max-width:600px;margin:0 auto;padding:20px 16px;display:flex;flex-direction:column;gap:24px;}
+.sec{display:flex;flex-direction:column;gap:12px;}
+.sec-title{font-size:12px;color:#666;text-transform:uppercase;letter-spacing:1px;padding-bottom:6px;border-bottom:1px solid #1a1a1a;display:flex;align-items:center;gap:6px;}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}
+.swatch{border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.06);}
+.sw-color{height:52px;}
+.sw-info{padding:8px 10px;background:#111;}
+.sw-name{font-size:11px;font-weight:500;color:#f0f0f0;}
+.sw-var{font-size:10px;color:#555;margin-top:2px;font-family:monospace;}
+.sw-hex{font-size:11px;color:#888;margin-top:2px;font-family:monospace;cursor:pointer;}
+.sw-hex:hover{color:#D4AF37;}
+.swatch.full .sw-color{height:70px;}
+.token-row{display:flex;align-items:center;gap:10px;padding:9px 12px;background:#111;border-radius:8px;border:1px solid #1a1a1a;}
+.tok-dot{width:28px;height:28px;border-radius:6px;flex-shrink:0;}
+.tok-info{flex:1;min-width:0;}
+.tok-name{font-size:12px;font-weight:500;color:#f0f0f0;}
+.tok-var{font-size:10px;color:#555;font-family:monospace;margin-top:1px;}
+.tok-val{font-size:11px;color:#888;font-family:monospace;text-align:right;flex-shrink:0;}
+.radius-row{display:flex;align-items:center;gap:10px;padding:9px 12px;background:#111;border-radius:8px;border:1px solid #1a1a1a;}
+.rad-box{width:36px;height:36px;background:#1a1a1a;border:1px solid #333;flex-shrink:0;}
+.rad-info{flex:1;}
+.rad-name{font-size:12px;color:#f0f0f0;}
+.rad-var{font-size:10px;color:#555;font-family:monospace;margin-top:1px;}
+.rad-val{font-size:11px;color:#888;font-family:monospace;text-align:right;}
+.btn-demo{padding:11px 20px;border-radius:18px;font-size:14px;font-weight:700;border:none;cursor:default;width:100%;}
+.demo-card{background:rgba(18,18,18,0.96);border:1px solid rgba(212,175,55,0.28);border-radius:26px;padding:20px;display:flex;flex-direction:column;gap:10px;}
+.demo-label{font-size:10px;color:#555;text-transform:uppercase;letter-spacing:1px;}
+.gradient-row{height:44px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;}
+.copy-tip{font-size:10px;color:#444;text-align:center;margin-top:4px;}
+.tag-demo{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600;}
+.input-demo{background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.1);border-radius:14px;padding:12px 16px;color:#fff;font-size:15px;width:100%;}
+.full-w{grid-column:1/-1;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo"><i class="ti ti-palette"></i> NAMCHOK99 — Color & Style Guide</div>
+  <div class="version">v1.0 · 2026</div>
+</div>
+
+<div class="body">
+
+  <!-- BACKGROUNDS -->
+  <div class="sec">
+    <div class="sec-title"><i class="ti ti-layout-2"></i> Background</div>
+    <div class="grid3">
+      <div class="swatch">
+        <div class="sw-color" style="background:#090909;"></div>
+        <div class="sw-info">
+          <div class="sw-name">bg-0</div>
+          <div class="sw-var">--bg-0</div>
+          <div class="sw-hex">#090909</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="sw-color" style="background:#101010;"></div>
+        <div class="sw-info">
+          <div class="sw-name">bg-1</div>
+          <div class="sw-var">--bg-1</div>
+          <div class="sw-hex">#101010</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="sw-color" style="background:#151515;"></div>
+        <div class="sw-info">
+          <div class="sw-name">bg-2</div>
+          <div class="sw-var">--bg-2</div>
+          <div class="sw-hex">#151515</div>
+        </div>
+      </div>
+      <div class="swatch full-w">
+        <div class="sw-color" style="background:rgba(18,18,18,0.96);border:1px dashed #2a2a2a;"></div>
+        <div class="sw-info">
+          <div class="sw-name">card-bg</div>
+          <div class="sw-var">--card-bg</div>
+          <div class="sw-hex">rgba(18,18,18,0.96)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GOLD -->
+  <div class="sec">
+    <div class="sec-title"><i class="ti ti-star"></i> Gold — สีหลัก</div>
+    <div class="grid3">
+      <div class="swatch">
+        <div class="sw-color" style="background:#D4AF37;"></div>
+        <div class="sw-info">
+          <div class="sw-name">gold-1</div>
+          <div class="sw-var">--gold-1</div>
+          <div class="sw-hex">#D4AF37</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="sw-color" style="background:#F2D27A;"></div>
+        <div class="sw-info">
+          <div class="sw-name">gold-2</div>
+          <div class="sw-var">--gold-2</div>
+          <div class="sw-hex">#F2D27A</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="sw-color" style="background:#8C6B1F;"></div>
+        <div class="sw-info">
+          <div class="sw-name">gold-3</div>
+          <div class="sw-var">--gold-3</div>
+          <div class="sw-hex">#8C6B1F</div>
+        </div>
+      </div>
+    </div>
+    <div class="token-row">
+      <div class="tok-dot" style="background:rgba(212,175,55,0.28);border:1px solid #D4AF37;"></div>
+      <div class="tok-info"><div class="tok-name">gold-border</div><div class="tok-var">--gold-border</div></div>
+      <div class="tok-val">rgba(212,175,55,0.28)</div>
+    </div>
+    <div class="token-row">
+      <div class="tok-dot" style="background:rgba(212,175,55,0.55);border:1px solid #D4AF37;"></div>
+      <div class="tok-info"><div class="tok-name">gold-border-active</div><div class="tok-var">--gold-border-active</div></div>
+      <div class="tok-val">rgba(212,175,55,0.55)</div>
+    </div>
+    <div class="token-row">
+      <div class="tok-dot" style="background:rgba(212,175,55,0.12);"></div>
+      <div class="tok-info"><div class="tok-name">gold-subtle</div><div class="tok-var">--gold-subtle</div></div>
+      <div class="tok-val">rgba(212,175,55,0.12)</div>
+    </div>
+    <!-- Gold gradient -->
+    <div>
+      <div class="demo-label" style="margin-bottom:6px;">Gold Gradient (text / shimmer)</div>
+      <div class="gradient-row" style="background:linear-gradient(135deg,#8C6B1F 0%,#F2D27A 50%,#8C6B1F 100%);">
+        <span style="color:#090909;font-weight:700;font-size:14px;">ตัวอักษรทอง</span>
+      </div>
+      <div style="margin-top:4px;font-size:10px;color:#555;font-family:monospace;">linear-gradient(135deg, #8C6B1F 0%, #F2D27A 50%, #8C6B1F 100%)</div>
+    </div>
+  </div>
+
+  <!-- GREEN / EMERALD -->
+  <div class="sec">
+    <div class="sec-title"><i class="ti ti-leaf"></i> Emerald — สีรอง</div>
+    <div class="grid3">
+      <div class="swatch">
+        <div class="sw-color" style="background:#0F5C3A;"></div>
+        <div class="sw-info">
+          <div class="sw-name">em-1</div>
+          <div class="sw-var">--em-1</div>
+          <div class="sw-hex">#0F5C3A</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="sw-color" style="background:#0A3D2A;"></div>
+        <div class="sw-info">
+          <div class="sw-name">em-2</div>
+          <div class="sw-var">--em-2</div>
+          <div class="sw-hex">#0A3D2A</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="sw-color" style="background:#19A56B;"></div>
+        <div class="sw-info">
+          <div class="sw-name">em-3</div>
+          <div class="sw-var">--em-3</div>
+          <div class="sw-hex">#19A56B</div>
+        </div>
+      </div>
+    </div>
+    <div class="token-row">
+      <div class="tok-dot" style="background:rgba(15,92,58,0.18);"></div>
+      <div class="tok-info"><div class="tok-name">em-subtle</div><div class="tok-var">--em-subtle</div></div>
+      <div class="tok-val">rgba(15,92,58,0.18)</div>
+    </div>
+    <div class="token-row">
+      <div class="tok-dot" style="background:rgba(26,122,82,0.45);"></div>
+      <div class="tok-info"><div class="tok-name">em-medium</div><div class="tok-var">--em-medium</div></div>
+      <div class="tok-val">rgba(26,122,82,0.45)</div>
+    </div>
+  </div>
+
+  <!-- STATUS -->
+  <div class="sec">
+    <div class="sec-title"><i class="ti ti-circle-check"></i> Status Colors</div>
+    <div class="grid">
+      <div class="swatch">
+        <div class="sw-color" style="background:#5BE38D;"></div>
+        <div class="sw-info">
+          <div class="sw-name">success</div>
+          <div class="sw-var">--success</div>
+          <div class="sw-hex">#5BE38D</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="sw-color" style="background:#FFC857;"></div>
+        <div class="sw-info">
+          <div class="sw-name">warning</div>
+          <div class="sw-var">--warning</div>
+          <div class="sw-hex">#FFC857</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="sw-color" style="background:#FF5E5E;"></div>
+        <div class="sw-info">
+          <div class="sw-name">danger</div>
+          <div class="sw-var">--danger</div>
+          <div class="sw-hex">#FF5E5E</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="sw-color" style="background:#5DBBFF;"></div>
+        <div class="sw-info">
+          <div class="sw-name">info</div>
+          <div class="sw-var">--info</div>
+          <div class="sw-hex">#5DBBFF</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BORDER RADIUS -->
+  <div class="sec">
+    <div class="sec-title"><i class="ti ti-border-radius"></i> Border Radius</div>
+    <div class="grid">
+      <div class="radius-row">
+        <div class="rad-box" style="border-radius:26px;"></div>
+        <div class="rad-info"><div class="rad-name">r-card</div><div class="rad-var">--r-card</div></div>
+        <div class="rad-val">26px</div>
+      </div>
+      <div class="radius-row">
+        <div class="rad-box" style="border-radius:18px;"></div>
+        <div class="rad-info"><div class="rad-name">r-btn</div><div class="rad-var">--r-btn</div></div>
+        <div class="rad-val">18px</div>
+      </div>
+      <div class="radius-row">
+        <div class="rad-box" style="border-radius:14px;"></div>
+        <div class="rad-info"><div class="rad-name">r-sm</div><div class="rad-var">--r-sm</div></div>
+        <div class="rad-val">14px</div>
+      </div>
+      <div class="radius-row">
+        <div class="rad-box" style="border-radius:12px;"></div>
+        <div class="rad-info"><div class="rad-name">r-tag</div><div class="rad-var">--r-tag</div></div>
+        <div class="rad-val">12px</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SPACING -->
+  <div class="sec">
+    <div class="sec-title"><i class="ti ti-spacing-horizontal"></i> Spacing</div>
+    <div class="grid">
+      <div class="token-row">
+        <div class="tok-dot" style="background:#1a1a1a;width:20px;height:36px;border-radius:4px;"></div>
+        <div class="tok-info"><div class="tok-name">px (padding x)</div><div class="tok-var">--px</div></div>
+        <div class="tok-val">20px</div>
+      </div>
+      <div class="token-row">
+        <div class="tok-dot" style="background:#1a1a1a;width:24px;height:36px;border-radius:4px;"></div>
+        <div class="tok-info"><div class="tok-name">card-p</div><div class="tok-var">--card-p</div></div>
+        <div class="tok-val">24px</div>
+      </div>
+      <div class="token-row">
+        <div class="tok-dot" style="background:#1a1a1a;width:18px;height:36px;border-radius:4px;"></div>
+        <div class="tok-info"><div class="tok-name">gap-card</div><div class="tok-var">--gap-card</div></div>
+        <div class="tok-val">18px</div>
+      </div>
+      <div class="token-row">
+        <div class="tok-dot" style="background:#1a1a1a;width:32px;height:36px;border-radius:4px;"></div>
+        <div class="tok-info"><div class="tok-name">gap-section</div><div class="tok-var">--gap-section</div></div>
+        <div class="tok-val">32px</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPONENT DEMO -->
+  <div class="sec">
+    <div class="sec-title"><i class="ti ti-components"></i> Component Demo</div>
+
+    <!-- Buttons -->
+    <div class="demo-label">Buttons</div>
+    <button class="btn-demo" style="background:linear-gradient(135deg,#8C6B1F,#F2D27A,#8C6B1F);color:#090909;">Primary — ทอง</button>
+    <button class="btn-demo" style="background:linear-gradient(135deg,#0A3D2A,#19A56B);color:#fff;">Success — เขียว</button>
+    <button class="btn-demo" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);">Ghost — โปร่งแสง</button>
+
+    <!-- Card -->
+    <div class="demo-label" style="margin-top:8px;">Card</div>
+    <div class="demo-card">
+      <div style="font-size:12px;color:#888;">ยอดเครดิต</div>
+      <div style="font-size:28px;font-weight:700;background:linear-gradient(135deg,#8C6B1F,#F2D27A,#8C6B1F);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">฿ 1,250.00</div>
+      <div style="display:flex;gap:8px;">
+        <span class="tag-demo" style="background:rgba(91,227,141,0.15);color:#5BE38D;"><i class="ti ti-check" style="font-size:11px;"></i> Active</span>
+        <span class="tag-demo" style="background:rgba(212,175,55,0.12);color:#D4AF37;"><i class="ti ti-star" style="font-size:11px;"></i> VIP</span>
+      </div>
+    </div>
+
+    <!-- Input -->
+    <div class="demo-label" style="margin-top:8px;">Input</div>
+    <input class="input-demo" placeholder="กรอกชื่อผู้ใช้..." readonly>
+
+    <!-- Tags -->
+    <div class="demo-label" style="margin-top:8px;">Status Tags</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <span class="tag-demo" style="background:rgba(91,227,141,0.15);color:#5BE38D;">สำเร็จ</span>
+      <span class="tag-demo" style="background:rgba(255,94,94,0.15);color:#FF5E5E;">ยกเลิก</span>
+      <span class="tag-demo" style="background:rgba(255,200,87,0.15);color:#FFC857;">รอดำเนินการ</span>
+      <span class="tag-demo" style="background:rgba(93,187,255,0.15);color:#5DBBFF;">ข้อมูล</span>
+    </div>
+  </div>
+
+  <!-- CSS VARIABLES BLOCK -->
+  <div class="sec">
+    <div class="sec-title"><i class="ti ti-code"></i> CSS Variables (copy ไปใช้ได้เลย)</div>
+    <div style="background:#0d0d0d;border:1px solid #1e1e1e;border-radius:12px;padding:14px 16px;font-family:monospace;font-size:11px;line-height:1.9;color:#888;overflow-x:auto;">
+      <span style="color:#555;">:root {</span><br>
+      &nbsp;&nbsp;<span style="color:#555;">/* Background */</span><br>
+      &nbsp;&nbsp;<span style="color:#5DBBFF;">--bg-0</span>: <span style="color:#5BE38D;">#090909</span>;<br>
+      &nbsp;&nbsp;<span style="color:#5DBBFF;">--bg-1</span>: <span style="color:#5BE38D;">#101010</span>;<br>
+      &nbsp;&nbsp;<span style="color:#5DBBFF;">--bg-2</span>: <span style="color:#5BE38D;">#151515</span>;<br>
+      &nbsp;&nbsp;<span style="color:#5DBBFF;">--card-bg</span>: <span style="color:#5BE38D;">rgba(18,18,18,0.96)</span>;<br><br>
+      &nbsp;&nbsp;<span style="color:#555;">/* Gold */</span><br>
+      &nbsp;&nbsp;<span style="color:#5DBBFF;">--gold-1</span>: <span style="color:#D4AF37;">#D4AF37</span>;<br>
+      &nbsp;&nbsp;<span style="color:#5DBBFF;">--gold-2</span>: <span style="color:#F2D27A;">#F2D27A</span>;<br>
+      &nbsp;&nbsp;<span style="color:#5DBBFF;">--gold-3</span>: <span style="color:#8C6B1F;">#8C6B1F</span>;<br>
+      &nbsp;&nbsp;<span style="color:#5DBBFF;">--gold-border</span>: <span style="color:#5BE38D;">rgba(212,175,55,0.28)</span>;<br>
+      &nbsp;&nbsp;<span style="color:#5DBBFF;">--gold-border-active</span>: <span style="color:#5BE38D;">rgba(212,175,55,0.55)</span>;<br>
+      &nbsp;&nbsp;<span style="color:#5DBBFF;">--gold-subtle</span>: <span style="color:#5BE38D;">rgba(212,175,55,0.12)</span>;<br><br>
+      &nbsp;&nbsp;<span style="color:#555;">/* Emerald */</span><br>
+      &nbsp;&nbsp;<span style="color:#5DBBFF;">--em-1</span>: <span style="color:#19A56B;">#0F5C3A</span>;<br>
+      &nbsp;&nbsp;<span style="color:#5DBBFF;">--em-2</span>: <span style="color:#19A56B;">#0A3D2A</span>;<br>
+      &nbsp;&nbsp;<span style="color:#5DBBFF;">--em-3</span>: <span style="color:#19A56B;">#19A56B</span>;<br>
+      &nbsp;&nbsp;<span style="color:#5DBBFF;">--em-subtle</span>: <span style="color:#5BE38D;">rgba(15,92,58,0.18)</span>;<br>
+      &nbsp;&nbsp;<span style="color:#5DBBFF;">--em-medium</span>: <span style="color:#5BE38D;">rgba(26,122,82,0.45)</span>;<br><br>
+      &nbsp;&nbsp;<span style="color:#555;">/* Status */</span><br>
+      &nbsp;&nbsp;<span style="color:#5DBBFF;">--success</span>: <span style="color:#5BE38D;">#5BE38D</span>;<br>
+      &nbsp;&nbsp;<span style="color:#5DBBFF;">--warning</span>: <span style="color:#FFC857;">#FFC857</span>;<br>
+      &nbsp;&nbsp;<span style="color:#5DBBFF;">--danger</span>: <span style="color:#FF5E5E;">#FF5E5E</span>;<br>
+      &nbsp;&nbsp;<span style="color:#5DBBFF;">--info</span>: <span style="color:#5DBBFF;">#5DBBFF</span>;<br><br>
+      &nbsp;&nbsp;<span style="color:#555;">/* Radius */</span><br>
+      &nbsp;&nbsp;<span style="color:#5DBBFF;">--r-card</span>: <span style="color:#5BE38D;">26px</span>;<br>
+      &nbsp;&nbsp;<span style="color:#5DBBFF;">--r-btn</span>: <span style="color:#5BE38D;">18px</span>;<br>
+      &nbsp;&nbsp;<span style="color:#5DBBFF;">--r-sm</span>: <span style="color:#5BE38D;">14px</span>;<br>
+      &nbsp;&nbsp;<span style="color:#5DBBFF;">--r-tag</span>: <span style="color:#5BE38D;">12px</span>;<br><br>
+      &nbsp;&nbsp;<span style="color:#555;">/* Spacing */</span><br>
+      &nbsp;&nbsp;<span style="color:#5DBBFF;">--px</span>: <span style="color:#5BE38D;">20px</span>;<br>
+      &nbsp;&nbsp;<span style="color:#5DBBFF;">--card-p</span>: <span style="color:#5BE38D;">24px</span>;<br>
+      &nbsp;&nbsp;<span style="color:#5DBBFF;">--gap-card</span>: <span style="color:#5BE38D;">18px</span>;<br>
+      &nbsp;&nbsp;<span style="color:#5DBBFF;">--gap-section</span>: <span style="color:#5BE38D;">32px</span>;<br>
+      <span style="color:#555;">}</span>
+    </div>
+  </div>
+
+  <div style="text-align:center;font-size:10px;color:#333;padding-top:8px;">NAMCHOK99 Color & Style Guide · สำหรับ Dev Team</div>
+
+</div>
+</body>
+</html>

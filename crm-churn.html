@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRM — ติดตามลูกค้าที่หายไป</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#0d0d0d;color:#f0f0f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;}
+.wrap{max-width:480px;margin:0 auto;min-height:100vh;padding-bottom:2rem;}
+.topbar{background:#1a1a1a;border-bottom:.5px solid #2a2a2a;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.logo{font-size:13px;font-weight:500;color:#D4AF37;display:flex;align-items:center;gap:7px;}
+.top-time{font-size:12px;color:#555;}
+.body{padding:14px 16px;display:flex;flex-direction:column;gap:12px;}
+.stat-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+.stat{background:#1a1a1a;border:.5px solid #2a2a2a;border-radius:12px;padding:12px 14px;}
+.stat-lbl{font-size:11px;color:#888;margin-bottom:4px;}
+.stat-val{font-size:22px;font-weight:500;}
+.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:#888;}
+.rl{display:flex;align-items:center;gap:5px;}
+.ld{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.search{flex:1;min-width:130px;background:#1a1a1a;border:.5px solid #2a2a2a;color:#f0f0f0;border-radius:8px;padding:8px 11px;font-size:13px;}
+.search:focus{outline:none;border-color:#D4AF37;}
+.seg{display:flex;background:#1a1a1a;border:.5px solid #2a2a2a;border-radius:8px;overflow:hidden;}
+.seg-btn{padding:7px 10px;font-size:12px;color:#888;cursor:pointer;border:none;background:none;white-space:nowrap;transition:background .15s;}
+.seg-btn.on{background:#252525;color:#f0f0f0;font-weight:500;}
+.sort-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#666;padding:0 2px;}
+.sort-btns{display:flex;gap:4px;}
+.sort-btn{display:flex;align-items:center;gap:4px;cursor:pointer;color:#888;font-size:11px;background:#1a1a1a;border:.5px solid #2a2a2a;padding:5px 9px;border-radius:8px;}
+.sort-btn.active{color:#D4AF37;border-color:#3a3000;background:#1a1800;}
+.table-card{background:#1a1a1a;border:.5px solid #2a2a2a;border-radius:12px;overflow:hidden;}
+.thead{background:#161616;border-bottom:.5px solid #2a2a2a;}
+.trow{display:grid;grid-template-columns:1fr 52px 52px 70px;align-items:center;padding:10px 13px;border-bottom:.5px solid #1a1a1a;gap:6px;}
+.trow:last-child{border-bottom:none;}
+.thead .trow{padding:8px 13px;}
+.th{font-size:10px;color:#555;font-weight:400;}
+.user-info{min-width:0;}
+.uname{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.uuser{font-size:10px;color:#555;margin-top:1px;font-family:monospace;}
+.uphone{font-size:10px;color:#666;margin-top:1px;}
+.uch{font-size:10px;margin-top:2px;}
+.days-pill{display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;padding:3px 8px;border-radius:20px;white-space:nowrap;}
+.rank-badge{display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;padding:3px 7px;border-radius:6px;white-space:nowrap;}
+.last-dep{font-size:11px;color:#888;text-align:right;}
+.amt{font-size:12px;font-weight:500;text-align:right;}
+.empty{padding:36px;text-align:center;font-size:13px;color:#333;}
+.sec-title{font-size:11px;color:#888;display:flex;align-items:center;gap:5px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="topbar">
+  <a href="/" style="text-decoration:none;"><div class="logo"><img src="logo.png" style="height:28px;width:auto;object-fit:contain;vertical-align:middle;margin-right:4px;"> CRM — ติดตามลูกค้า</div></a>
+  <span class="top-time" id="top-time">—</span>
+</div>
+
+<div class="body">
+  <div class="stat-row" id="stats"></div>
+
+  <div>
+    <div class="sec-title" style="margin-bottom:8px;"><i class="ti ti-circle-filled" aria-hidden="true"></i> ระดับความเสี่ยง</div>
+    <div class="legend">
+      <div class="rl"><div class="ld" style="background:#e05c5c"></div>วิกฤต 30+ วัน</div>
+      <div class="rl"><div class="ld" style="background:#f59e0b"></div>เสี่ยง 15-29 วัน</div>
+      <div class="rl"><div class="ld" style="background:#3b82f6"></div>ติดตาม 7-14 วัน</div>
+      <div class="rl"><div class="ld" style="background:#4caf81"></div>ปกติ &lt;7 วัน</div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <input class="search" type="text" placeholder="ค้นหาชื่อ / username / เบอร์..." id="search-inp" oninput="render()">
+    <div class="seg">
+      <button class="seg-btn on" onclick="setFilter('all',this)">ทั้งหมด</button>
+      <button class="seg-btn" onclick="setFilter('crit',this)">วิกฤต</button>
+      <button class="seg-btn" onclick="setFilter('risk',this)">เสี่ยง</button>
+      <button class="seg-btn" onclick="setFilter('watch',this)">ติดตาม</button>
+    </div>
+  </div>
+
+  <div class="sort-row">
+    <span id="result-count">—</span>
+    <div class="sort-btns">
+      <button class="sort-btn active" id="sb-days" onclick="setSort('days')">
+        <i class="ti ti-clock" aria-hidden="true"></i> วันที่หายไป
+      </button>
+      <button class="sort-btn" id="sb-amt" onclick="setSort('amt')">
+        <i class="ti ti-currency-baht" aria-hidden="true"></i> ยอดฝาก
+      </button>
+      <button class="sort-btn" id="sb-rank" onclick="setSort('rank')">
+        <i class="ti ti-star" aria-hidden="true"></i> Rank
+      </button>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="thead">
+      <div class="trow">
+        <div class="th">ลูกค้า</div>
+        <div class="th" style="text-align:center">rank</div>
+        <div class="th" style="text-align:center">หายไป</div>
+        <div class="th" style="text-align:right">ยอดฝาก</div>
+      </div>
+    </div>
+    <div id="tbl-body"></div>
+  </div>
+</div>
+</div>
+
+<script>
+const RANKS=[
+  {label:'VIP',color:'#D4AF37',bg:'#2a2200'},
+  {label:'Gold',color:'#f59e0b',bg:'#2a1800'},
+  {label:'Silver',color:'#aaaaaa',bg:'#222222'},
+  {label:'Bronze',color:'#cd7c54',bg:'#2a1a10'},
+  {label:'Normal',color:'#666',bg:'#1e1e1e'},
+];
+
+const DATA=[
+  {id:1,name:'สมชาย ใจดี',username:'somchai88',phone:'089-123-4567',days:45,lastDep:'1 พ.ค. 68',totalDep:85000,rank:0,ch:'Facebook'},
+  {id:2,name:'นภา รักดี',username:'napa_lucky',phone:'081-234-5678',days:38,lastDep:'8 พ.ค. 68',totalDep:42000,rank:1,ch:'Line OA'},
+  {id:3,name:'วิชัย สุขสม',username:'wichai99',phone:'062-345-6789',days:31,lastDep:'15 พ.ค. 68',totalDep:120000,rank:0,ch:'AFF'},
+  {id:4,name:'มาลี พรมดี',username:'malee_bet',phone:'095-456-7890',days:27,lastDep:'25 พ.ค. 68',totalDep:18000,rank:3,ch:'TikTok'},
+  {id:5,name:'ธนกร แก้วมณี',username:'thanakorn2',phone:'086-567-8901',days:22,lastDep:'30 พ.ค. 68',totalDep:55000,rank:1,ch:'Facebook'},
+  {id:6,name:'ศิริพร ทองใส',username:'siriporn_t',phone:'091-678-9012',days:18,lastDep:'4 มิ.ย. 68',totalDep:9500,rank:4,ch:'SEO'},
+  {id:7,name:'ประยุทธ์ สีดา',username:'prayuth55',phone:'083-789-0123',days:15,lastDep:'7 มิ.ย. 68',totalDep:32000,rank:2,ch:'Line OA'},
+  {id:8,name:'กนกวรรณ มีสุข',username:'kanok_win',phone:'076-890-1234',days:12,lastDep:'10 มิ.ย. 68',totalDep:28000,rank:2,ch:'เซียน'},
+  {id:9,name:'อนุชา บุญมา',username:'anucha_x',phone:'088-901-2345',days:9,lastDep:'13 มิ.ย. 68',totalDep:76000,rank:0,ch:'Facebook'},
+  {id:10,name:'พิมพ์ใจ ศรีสุข',username:'pimjai_p',phone:'092-012-3456',days:7,lastDep:'15 มิ.ย. 68',totalDep:14000,rank:3,ch:'AFF'},
+  {id:11,name:'ณัฐวุฒิ คงดี',username:'nat_kd',phone:'064-123-4567',days:5,lastDep:'17 มิ.ย. 68',totalDep:21000,rank:2,ch:'TikTok'},
+  {id:12,name:'รัตนา พงษ์ไทย',username:'ratana99',phone:'098-234-5678',days:3,lastDep:'19 มิ.ย. 68',totalDep:48000,rank:1,ch:'SEO'},
+];
+
+let sortKey='days';
+let sortDir='desc';
+let curFilter='all';
+
+function risk(d){
+  if(d>=30)return{color:'#e05c5c',bg:'#2a0a0a'};
+  if(d>=15)return{color:'#f59e0b',bg:'#2a1f00'};
+  if(d>=7) return{color:'#3b82f6',bg:'#0d1f3c'};
+  return{color:'#4caf81',bg:'#0a2a1a'};
+}
+
+function setFilter(f,el){
+  curFilter=f;
+  document.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  render();
+}
+
+function setSort(key){
+  if(sortKey===key)sortDir=sortDir==='desc'?'asc':'desc';
+  else{sortKey=key;sortDir='desc';}
+  ['days','amt','rank'].forEach(k=>{
+    const btn=document.getElementById('sb-'+k);
+    if(btn)btn.className='sort-btn'+(sortKey===k?' active':'');
+  });
+  render();
+}
+
+function render(){
+  const q=document.getElementById('search-inp').value.toLowerCase();
+  let d=[...DATA];
+  if(q)d=d.filter(r=>r.name.toLowerCase().includes(q)||r.username.toLowerCase().includes(q)||r.phone.includes(q));
+  if(curFilter==='crit')d=d.filter(r=>r.days>=30);
+  else if(curFilter==='risk')d=d.filter(r=>r.days>=15&&r.days<30);
+  else if(curFilter==='watch')d=d.filter(r=>r.days>=7&&r.days<15);
+
+  d.sort((a,b)=>{
+    let av,bv;
+    if(sortKey==='days'){av=a.days;bv=b.days;}
+    else if(sortKey==='amt'){av=a.totalDep;bv=b.totalDep;}
+    else{av=a.rank;bv=b.rank;}
+    return sortDir==='desc'?bv-av:av-bv;
+  });
+
+  document.getElementById('result-count').textContent='พบ '+d.length+' ราย';
+
+  const body=document.getElementById('tbl-body');
+  if(!d.length){body.innerHTML='<div class="empty"><i class="ti ti-mood-happy"></i><br>ไม่พบลูกค้าที่ตรงเงื่อนไข</div>';return;}
+
+  body.innerHTML=d.map(r=>{
+    const rv=risk(r.days);
+    const rk=RANKS[r.rank]||RANKS[4];
+    return`<div class="trow">
+      <div class="user-info">
+        <div class="uname">${r.name}</div>
+        <div class="uuser">@${r.username}</div>
+        <div class="uphone">${r.phone}</div>
+        <div class="uch" style="color:${r.ch==='Facebook'?'#5b9bd5':r.ch==='Line OA'?'#4caf81':r.ch==='TikTok'?'#e05c5c':r.ch==='AFF'?'#D4AF37':'#888'}">${r.ch}</div>
+      </div>
+      <div style="text-align:center">
+        <span class="rank-badge" style="color:${rk.color};background:${rk.bg}">${rk.label}</span>
+      </div>
+      <div style="text-align:center">
+        <span class="days-pill" style="color:${rv.color};background:${rv.bg}">${r.days}ว</span>
+      </div>
+      <div>
+        <div class="amt" style="color:${rv.color}">฿${r.totalDep.toLocaleString()}</div>
+        <div class="last-dep">${r.lastDep}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const crit=DATA.filter(r=>r.days>=30).length;
+  const riskC=DATA.filter(r=>r.days>=15&&r.days<30).length;
+  const avg=Math.round(DATA.reduce((s,r)=>s+r.days,0)/DATA.length);
+  const vip=DATA.filter(r=>r.rank===0).length;
+  document.getElementById('stats').innerHTML=`
+    <div class="stat"><div class="stat-lbl">วิกฤต (30+ วัน)</div><div class="stat-val" style="color:#e05c5c">${crit} ราย</div></div>
+    <div class="stat"><div class="stat-lbl">เสี่ยง (15-29 วัน)</div><div class="stat-val" style="color:#f59e0b">${riskC} ราย</div></div>
+    <div class="stat"><div class="stat-lbl">VIP ที่หายไป</div><div class="stat-val" style="color:#D4AF37">${vip} ราย</div></div>
+    <div class="stat"><div class="stat-lbl">เฉลี่ยหายไป</div><div class="stat-val">${avg} วัน</div></div>`;
+}
+
+setInterval(()=>{document.getElementById('top-time').textContent=new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'});},1000);
+render();
+</script>
+</body>
+</html>

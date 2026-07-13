@@ -3,354 +3,153 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>NAMCHOK99 — Staff Logger</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/tabler-icons.min.css">
+<title>NAMCHOK99 — Dashboard</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:#0d0d0d;}
-.wrap{background:#111;color:#f0f0f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;max-width:430px;margin:0 auto;min-height:100vh;}
-.topbar{background:#1a1a1a;border-bottom:.5px solid #2a2a2a;padding:11px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
-.logo{font-size:13px;font-weight:500;color:#D4AF37;}
-.top-time{font-size:12px;color:#555;}
-.body{padding:12px 16px;display:flex;flex-direction:column;gap:12px;}
-.row2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
-.field{display:flex;flex-direction:column;gap:4px;}
-.lbl{font-size:11px;color:#888;}
-.inp{background:#1a1a1a;border:.5px solid #2a2a2a;color:#f0f0f0;border-radius:8px;padding:8px 10px;font-size:13px;width:100%;}
-.inp:focus{outline:none;border-color:#D4AF37;}
-select.inp option{background:#1a1a1a;}
-.sec-title{font-size:11px;color:#888;display:flex;align-items:center;gap:5px;margin-bottom:7px;}
-.ch-tabs{display:flex;gap:6px;flex-wrap:wrap;}
-.ch-tab{padding:7px 14px;border-radius:20px;font-size:12px;border:.5px solid #2a2a2a;background:#1a1a1a;color:#888;cursor:pointer;white-space:nowrap;transition:transform .15s,box-shadow .15s;}
-.ch-tab:hover{transform:translateY(-2px);}
-.ch-tab.active{color:#111;font-weight:500;}
-.entry-card{background:#1a1a1a;border:.5px solid #2a2a2a;border-radius:12px;overflow:hidden;}
-.entry-section{padding:11px 13px;border-bottom:.5px solid #1e1e1e;}
-.entry-section:last-child{border-bottom:none;}
-.action-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;}
-.act-btn{display:flex;align-items:center;gap:9px;padding:11px 12px;border-radius:10px;border:.5px solid #2a2a2a;background:#161616;cursor:pointer;transition:transform .15s,box-shadow .15s;}
-.act-btn:hover{transform:translateY(-3px);}
-.act-btn.selected{border-width:1.5px;}
-.act-btn:active{transform:scale(0.97);}
-.act-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px;}
-.act-info{flex:1;min-width:0;}
-.act-name{font-size:12px;font-weight:500;}
-.act-check{font-size:14px;color:#444;flex-shrink:0;}
-.act-check.on{color:#4caf81;}
-.reason-row{display:flex;align-items:center;gap:8px;margin-top:6px;}
-.commit-btn{width:100%;padding:14px;background:#1a2a1a;border:.5px solid #2a4a2a;border-radius:10px;color:#4caf81;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .15s;}
-.commit-btn:hover:not(:disabled){transform:translateY(-2px);}
-.commit-btn:active{opacity:.75;}
-.commit-btn:disabled{opacity:.35;cursor:default;}
-.add-reason{display:flex;gap:6px;margin-top:8px;}
-.add-inp{flex:1;background:#161616;border:.5px dashed #2a2a2a;color:#ccc;border-radius:8px;padding:7px 10px;font-size:12px;}
-.add-inp:focus{outline:none;border-color:#555;}
-.add-btn{background:#1e1e1e;border:.5px solid #2a2a2a;color:#888;border-radius:8px;padding:7px 12px;font-size:12px;cursor:pointer;}
-.add-btn:active{color:#D4AF37;}
-.feed-card{background:#1a1a1a;border:.5px solid #2a2a2a;border-radius:12px;overflow:hidden;}
-.feed-head{display:flex;align-items:center;justify-content:space-between;padding:10px 13px;border-bottom:.5px solid #1e1e1e;}
-.feed-title{font-size:11px;color:#888;display:flex;align-items:center;gap:5px;}
-.clr-btn{font-size:11px;color:#444;background:none;border:none;cursor:pointer;}
-.clr-btn:active{color:#e05c5c;}
-.feed-list{max-height:240px;overflow-y:auto;}
-.feed-item{display:flex;align-items:flex-start;gap:9px;padding:10px 13px;border-bottom:.5px solid #1a1a1a;animation:fi .2s ease;}
-.feed-item:last-child{border-bottom:none;}
-@keyframes fi{from{opacity:0;transform:translateY(-5px);}to{opacity:1;}}
-.fi-left{display:flex;flex-direction:column;align-items:center;gap:3px;flex-shrink:0;}
-.fi-ch{font-size:9px;font-weight:500;padding:2px 6px;border-radius:20px;}
-.fi-time{font-size:9px;color:#444;}
-.fi-body{flex:1;min-width:0;}
-.fi-tags{display:flex;flex-wrap:wrap;gap:4px;}
-.fi-tag{font-size:10px;padding:2px 7px;border-radius:20px;border:.5px solid;}
-.fi-reason{font-size:10px;color:#888;margin-top:4px;}
-.fi-del{background:none;border:none;color:#2a2a2a;cursor:pointer;font-size:13px;flex-shrink:0;padding:2px;}
-.fi-del:active{color:#e05c5c;}
-.empty-feed{padding:20px;text-align:center;font-size:12px;color:#333;}
-.sum-card{background:#1a1a1a;border:.5px solid #2a2a2a;border-radius:12px;padding:13px;}
-.sum-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:8px;}
-.sum-cell{background:#161616;border-radius:8px;padding:9px 10px;text-align:center;}
-.sum-lbl{font-size:9px;color:#666;}
-.sum-val{font-size:17px;font-weight:500;margin-top:2px;}
-.rate-note{font-size:10px;color:#555;margin-top:8px;text-align:center;}
-.reason-bars{display:flex;flex-direction:column;gap:6px;margin-top:8px;}
-.rbar-row{display:flex;align-items:center;gap:8px;}
-.rbar-name{font-size:11px;color:#bbb;width:90px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.rbar-track{flex:1;background:#1e1e1e;border-radius:4px;height:7px;overflow:hidden;}
-.rbar-fill{height:100%;border-radius:4px;background:#e05c5c;transition:width .3s;}
-.rbar-cnt{font-size:12px;font-weight:500;color:#e05c5c;min-width:20px;text-align:right;}
-.version{padding:16px 0 8px;text-align:center;font-size:10px;color:#222;}
+body{background:#0d0d0d;color:#f0f0f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;min-height:100vh;}
+/* LOGIN */
+#login-screen{position:fixed;inset:0;background:#0d0d0d;z-index:999;display:none;align-items:center;justify-content:center;padding:20px;}
+#login-screen.show{display:flex;}
+.login-box{background:#1a1a1a;border:.5px solid #2a2a2a;border-radius:16px;padding:28px 24px;width:100%;max-width:360px;}
+.login-logo{text-align:center;margin-bottom:6px;}
+.login-sub{font-size:11px;color:#555;text-align:center;margin-bottom:24px;}
+.login-lbl{font-size:11px;color:#888;margin-bottom:5px;}
+.login-inp{width:100%;background:#111;border:.5px solid #2a2a2a;color:#f0f0f0;border-radius:8px;padding:10px 12px;font-size:14px;margin-bottom:14px;}
+.login-inp:focus{outline:none;border-color:#D4AF37;}
+.login-btn{width:100%;background:#D4AF37;color:#0d0d0d;border:none;border-radius:8px;padding:11px;font-size:14px;font-weight:600;cursor:pointer;margin-top:4px;}
+.login-btn:active{opacity:.85;}
+.login-err{font-size:12px;color:#e05c5c;text-align:center;margin-top:10px;min-height:18px;}
+/* MAIN */
+.wrap{max-width:430px;margin:0 auto;min-height:100vh;}
+.topbar{background:#1a1a1a;border-bottom:.5px solid #2a2a2a;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.topbar-logo{display:flex;align-items:center;gap:8px;}
+.logout-btn{background:#2a1a1a;border:.5px solid #4a2a2a;color:#e05c5c;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;}
+.body{padding:16px;}
+.welcome{text-align:center;padding:20px 0 24px;}
+.welcome-name{font-size:13px;color:#888;margin-bottom:4px;}
+.welcome-title{font-size:18px;font-weight:500;color:#D4AF37;}
+.menu-grid{display:flex;flex-direction:column;gap:12px;}
+.menu-card{background:#1a1a1a;border:.5px solid #2a2a2a;border-radius:14px;padding:18px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;text-decoration:none;color:inherit;transition:all .15s;}
+.menu-card:hover{border-color:#D4AF37;background:#1e1e1e;transform:translateY(-2px);}
+.menu-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.menu-icon svg{width:22px;height:22px;stroke:#D4AF37;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+.menu-info{flex:1;}
+.menu-title{font-size:15px;font-weight:500;color:#f0f0f0;margin-bottom:3px;}
+.menu-desc{font-size:11px;color:#666;}
+.menu-arrow{color:#444;font-size:18px;}
+.not-updated{font-size:10px;font-weight:600;background:#3a2e00;color:#FFC857;border:.5px solid #5a4800;border-radius:6px;padding:3px 7px;white-space:nowrap;}
+.footer{text-align:center;font-size:10px;color:#333;padding:24px 0 16px;}
 </style>
 </head>
 <body>
+
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo"><img src="logo.png" style="height:110px;width:auto;object-fit:contain;display:block;margin:0 auto 10px;"></div>
+    <div class="login-sub">NAMCHOK99 — เข้าสู่ระบบ</div>
+    <div class="login-lbl">Username</div>
+    <input class="login-inp" type="text" id="l-user" placeholder="username" autocomplete="username">
+    <div class="login-lbl">Password</div>
+    <input class="login-inp" type="password" id="l-pass" placeholder="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">เข้าสู่ระบบ</button>
+    <div class="login-err" id="l-err"></div>
+  </div>
+</div>
+
 <div class="wrap">
-<div class="topbar">
-  <span class="logo"><i class="ti ti-bolt"></i> Staff Logger — NAMCHOK99</span>
-  <span class="top-time" id="top-time">—</span>
-</div>
-
-<div class="body">
-  <div class="row2">
-    <div class="field">
-      <div class="lbl"><i class="ti ti-calendar"></i> วันที่</div>
-      <input class="inp" type="date" id="f-date">
+  <div class="topbar">
+    <div class="topbar-logo">
+      <img src="logo.png" style="height:32px;width:auto;object-fit:contain;">
     </div>
-    <div class="field">
-      <div class="lbl"><i class="ti ti-user"></i> พนักงาน</div>
-      <select class="inp" id="f-staff">
-        <option value="">— เลือก —</option>
-        <option>Admin</option>
-        <option>พนักงาน 1</option>
-        <option>พนักงาน 2</option>
-        <option>พนักงาน 3</option>
-      </select>
-    </div>
+    <button class="logout-btn" onclick="doLogout()"><svg style="width:14px;height:14px;stroke:#e05c5c;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;vertical-align:-2px;" viewBox="0 0 24 24"><path d="M14 8v-2a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2v-2"/><path d="M9 12h12l-3-3m0 6l3-3"/></svg> ออกจากระบบ</button>
   </div>
 
-  <div>
-    <div class="sec-title"><i class="ti ti-antenna-bars-5"></i> ช่องทาง</div>
-    <div class="ch-tabs" id="ch-tabs"></div>
-  </div>
-
-  <div class="entry-card">
-    <div class="entry-section">
-      <div class="sec-title"><i class="ti ti-user-plus"></i> สถานะลูกค้า (เลือกได้หลายอย่าง)</div>
-      <div class="action-grid" id="action-grid"></div>
+  <div class="body">
+    <div class="welcome">
+      <div class="welcome-name">ยินดีต้อนรับ</div>
+      <div class="welcome-title">NAMCHOK99 Dashboard</div>
     </div>
-    <div class="entry-section" id="reason-section" style="display:none;">
-      <div class="sec-title"><i class="ti ti-message-x"></i> เหตุผลที่ปิดไม่ได้</div>
-      <div class="reason-row">
-        <select class="inp" id="reason-select" style="font-size:12px;flex:1;"></select>
-      </div>
-      <div class="add-reason">
-        <input class="add-inp" type="text" id="new-reason" placeholder="+ เพิ่มเหตุผลใหม่...">
-        <button class="add-btn" onclick="addReason()"><i class="ti ti-plus"></i> เพิ่ม</button>
-      </div>
-    </div>
-    <div class="entry-section">
-      <button class="commit-btn" id="commit-btn" onclick="commitEntry()" disabled>
-        <i class="ti ti-device-floppy"></i> บันทึกรายการนี้
-      </button>
-    </div>
-  </div>
 
-  <div class="feed-card">
-    <div class="feed-head">
-      <div class="feed-title"><i class="ti ti-list"></i> รายการวันนี้ (<span id="feed-count">0</span>)</div>
-      <button class="clr-btn" onclick="clearFeed()"><i class="ti ti-trash"></i> ล้าง</button>
+    <div class="menu-grid">
+      <a class="menu-card" href="marketing.html">
+        <div class="menu-icon" style="background:#1a2a1a;"><svg viewBox="0 0 24 24"><rect x="3" y="12" width="4" height="8" rx="1"/><rect x="9" y="8" width="4" height="12" rx="1"/><rect x="15" y="4" width="4" height="16" rx="1"/></svg></div>
+        <div class="menu-info">
+          <div class="menu-title">Dashboard ลูกค้าใหม่</div>
+          <div class="menu-desc">ติดตามสมาชิกใหม่รายเดือน แยกช่องทาง</div>
+        </div>
+        <span class="not-updated">ยังไม่อัปเดต</span>
+      </a>
+
+      <a class="menu-card" href="budget.html">
+        <div class="menu-icon" style="background:#1a1a2a;"><svg viewBox="0 0 24 24"><rect x="7" y="9" width="14" height="10" rx="2"/><circle cx="14" cy="14" r="2"/><path d="M17 9V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/></svg></div>
+        <div class="menu-info">
+          <div class="menu-title">งบรายจ่ายบริษัท</div>
+          <div class="menu-desc">บันทึกค่าใช้จ่าย ทุนตั้งต้น คงเหลือรายเดือน</div>
+        </div>
+        <div class="menu-arrow">›</div>
+      </a>
+
+      <a class="menu-card" href="crm-churn.html">
+        <div class="menu-icon" style="background:#2a1a1a;"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0-3-3.85"/></svg></div>
+        <div class="menu-info">
+          <div class="menu-title">CRM ติดตามลูกค้า</div>
+          <div class="menu-desc">ลูกค้าที่หายไป จัดเรียงตามวันที่ไม่ active</div>
+        </div>
+        <span class="not-updated">ยังไม่อัปเดต</span>
+      </a>
+
+      <a class="menu-card" href="worktable-july.html">
+        <div class="menu-icon" style="background:#1a1a1a;"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="2"/><line x1="16" y1="3" x2="16" y2="7"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="4" y1="11" x2="20" y2="11"/><line x1="8" y1="15" x2="8.01" y2="15"/><line x1="12" y1="15" x2="12.01" y2="15"/><line x1="16" y1="15" x2="16.01" y2="15"/></svg></div>
+        <div class="menu-info">
+          <div class="menu-title">ตารางงานพนักงาน</div>
+          <div class="menu-desc">ตารางกะทำงาน มิ.ย. — ธ.ค. 2026</div>
+        </div>
+        <div class="menu-arrow">›</div>
+      </a>
+
+      <a class="menu-card" href="staff.html">
+        <div class="menu-icon" style="background:#1a1a2a;"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20v-2a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v2"/></svg></div>
+        <div class="menu-info">
+          <div class="menu-title">ข้อมูลพนักงาน</div>
+          <div class="menu-desc">บันทึกชื่อ เบอร์ ตำแหน่ง กะ วันเริ่มงาน</div>
+        </div>
+        <div class="menu-arrow">›</div>
+      </a>
+
+      <a class="menu-card" href="pnl.html">
+        <div class="menu-icon" style="background:#1a2a1a;"><svg viewBox="0 0 24 24"><path d="M3 19a9 9 0 0 1 9 0 9 9 0 0 1 9 0"/><path d="M3 6a9 9 0 0 1 9 0 9 9 0 0 1 9 0"/><line x1="3" y1="6" x2="3" y2="19"/><line x1="12" y1="6" x2="12" y2="19"/><line x1="21" y1="6" x2="21" y2="19"/></svg></div>
+        <div class="menu-info">
+          <div class="menu-title">บัญชีกำไร/ขาดทุน</div>
+          <div class="menu-desc">ยอดฝาก ถอน MRD Bonus CASH รายวัน</div>
+        </div>
+        <div class="menu-arrow">›</div>
+      </a>
+
+      <a class="menu-card" href="report.html">
+        <div class="menu-icon" style="background:#2a1a2a;"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg></div>
+        <div class="menu-info">
+          <div class="menu-title">รายงานสรุปผลรายวัน</div>
+          <div class="menu-desc">New User ยอดฝาก/ถอน โบนัส กำไร/ขาดทุนสุทธิ</div>
+        </div>
+        <div class="menu-arrow">›</div>
+      </a>
     </div>
-    <div class="feed-list" id="feed-list">
-      <div class="empty-feed">ยังไม่มีรายการ</div>
-    </div>
-  </div>
 
-  <div class="sum-card">
-    <div class="sec-title"><i class="ti ti-chart-bar"></i> สรุปวันนี้</div>
-    <div class="sum-grid" id="sum-grid"></div>
-    <div class="rate-note" id="rate-note"></div>
+    <div class="footer">NAMCHOK99 · v1.0</div>
   </div>
-
-  <div class="sum-card">
-    <div class="sec-title"><i class="ti ti-chart-bar-left"></i> เหตุผลที่ปิดไม่ได้</div>
-    <div class="reason-bars" id="reason-bars"><div style="font-size:12px;color:#333;padding:8px 0;">ยังไม่มีข้อมูล</div></div>
-  </div>
-
-  <div class="version">NAMCHOK99 Staff Logger v1.0</div>
-</div>
 </div>
 
 <script>
-const CHANNELS=[
-  {id:'live',name:'Live',color:'#f59e0b'},
-  {id:'ads',name:'Ads',color:'#3b82f6'},
-  {id:'expert',name:'เซียน',color:'#a855f7'},
-  {id:'seo',name:'SEO',color:'#10b981'},
-  {id:'aff',name:'AFF',color:'#D4AF37'},
-];
-const ACTIONS=[
-  {id:'contact',name:'ทักเข้ามา',icon:'ti-message',color:'#3b82f6',bg:'#0d1f3c'},
-  {id:'inquiry',name:'สอบถาม',icon:'ti-help-circle',color:'#a855f7',bg:'#1e0a2a'},
-  {id:'register',name:'สมัครแล้ว',icon:'ti-user-check',color:'#f59e0b',bg:'#2a1f00'},
-  {id:'deposit',name:'ฝากแล้ว',icon:'ti-cash',color:'#4caf81',bg:'#0a2a1a'},
-  {id:'nodeposit',name:'ไม่ฝาก',icon:'ti-user-x',color:'#e05c5c',bg:'#2a0a0a'},
-];
-const DEFAULT_REASONS=[
-  {l:'ไม่มีเงิน',c:'#f59e0b'},
-  {l:'ขอคิดดูก่อน',c:'#3b82f6'},
-  {l:'ไม่สนใจ',c:'#888'},
-  {l:'ไม่รับสาย',c:'#a855f7'},
-  {l:'อ่านไม่ตอบ',c:'#10b981'},
-  {l:'บล็อกทันที',c:'#e05c5c'},
-];
-
-let curCh='live';
-let selected=new Set();
-let logs=[];
-let reasons=[...DEFAULT_REASONS];
-
-function today(){return new Date().toISOString().split('T')[0];}
-function nowTime(){return new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'});}
-function getDate(){return document.getElementById('f-date').value||today();}
-function getStaff(){return document.getElementById('f-staff').value;}
-function lkey(){return`nc3_log_${getDate()}_${getStaff()||'all'}`;}
-function rkey(){return`nc3_reasons_${getDate()}_${getStaff()||'all'}`;}
-
-function buildChTabs(){
-  const wrap=document.getElementById('ch-tabs');wrap.innerHTML='';
-  CHANNELS.forEach(ch=>{
-    const el=document.createElement('div');
-    el.className='ch-tab'+(ch.id===curCh?' active':'');
-    if(ch.id===curCh){el.style.background=ch.color;el.style.borderColor=ch.color;}
-    el.textContent=ch.name;
-    el.onclick=()=>{curCh=ch.id;buildChTabs();};
-    wrap.appendChild(el);
-  });
+const USERS=[{user:'admin',pass:'namchok99'},{user:'manager',pass:'nc2026'}];
+function doLogin(){
+  const u=document.getElementById('l-user').value.trim();
+  const p=document.getElementById('l-pass').value;
+  const ok=USERS.find(x=>x.user===u&&x.pass===p);
+  if(ok){sessionStorage.setItem('nc_auth','1');document.getElementById('login-screen').classList.remove('show');}
+  else{document.getElementById('l-err').textContent='Username หรือ Password ไม่ถูกต้อง';document.getElementById('l-pass').value='';}
 }
-
-function buildActionGrid(){
-  const grid=document.getElementById('action-grid');grid.innerHTML='';
-  ACTIONS.forEach(a=>{
-    const on=selected.has(a.id);
-    const btn=document.createElement('div');
-    btn.className='act-btn'+(on?' selected':'');
-    if(on){btn.style.background=a.bg;btn.style.borderColor=a.color;}
-    btn.innerHTML=`
-      <div class="act-icon" style="background:${a.bg}"><i class="ti ${a.icon}" style="color:${a.color}"></i></div>
-      <div class="act-info"><div class="act-name" style="color:${on?a.color:'#bbb'}">${a.name}</div></div>
-      <i class="ti ${on?'ti-circle-check':'ti-circle'} act-check${on?' on':''}"></i>`;
-    btn.onclick=()=>toggleAction(a.id);
-    grid.appendChild(btn);
-  });
-  document.getElementById('reason-section').style.display=selected.has('nodeposit')?'block':'none';
-  document.getElementById('commit-btn').disabled=selected.size===0;
-}
-
-function toggleAction(id){
-  if(selected.has(id))selected.delete(id);else selected.add(id);
-  buildActionGrid();
-}
-
-function commitEntry(){
-  if(selected.size===0)return;
-  const reason=selected.has('nodeposit')?document.getElementById('reason-select').value:'';
-  logs.unshift({id:Date.now(),ch:curCh,actions:[...selected],reason,time:nowTime(),ts:Date.now(),staff:getStaff()});
-  selected.clear();
-  saveData();buildActionGrid();renderFeed();updateSummary();updateReasonBars();
-  const btn=document.getElementById('commit-btn');
-  btn.innerHTML='<i class="ti ti-check"></i> บันทึกแล้ว!';
-  btn.style.color='#D4AF37';
-  setTimeout(()=>{btn.innerHTML='<i class="ti ti-device-floppy"></i> บันทึกรายการนี้';btn.style.color='#4caf81';},1200);
-}
-
-function renderFeed(){
-  const list=document.getElementById('feed-list');
-  document.getElementById('feed-count').textContent=logs.length;
-  if(!logs.length){list.innerHTML='<div class="empty-feed">ยังไม่มีรายการ</div>';return;}
-  const chMap=Object.fromEntries(CHANNELS.map(c=>[c.id,c]));
-  const acMap=Object.fromEntries(ACTIONS.map(a=>[a.id,a]));
-  list.innerHTML=logs.map(l=>{
-    const ch=chMap[l.ch];
-    const tags=l.actions.map(aid=>{
-      const a=acMap[aid];
-      return`<span class="fi-tag" style="color:${a?.color};border-color:${a?.color}44;background:${a?.color}11">${a?.name||aid}</span>`;
-    }).join('');
-    return`<div class="feed-item" id="fi-${l.id}">
-      <div class="fi-left">
-        <span class="fi-ch" style="background:${ch?.color}22;color:${ch?.color}">${ch?.name||l.ch}</span>
-        <span class="fi-time">${l.time}</span>
-      </div>
-      <div class="fi-body">
-        <div class="fi-tags">${tags}</div>
-        ${l.reason?(()=>{const rc=reasons.find(r=>rLabel(r)===l.reason);const col=rc?rColor(rc,reasons.indexOf(rc)):'#e05c5c';return`<div class="fi-reason" style="color:${col}"><i class="ti ti-message-x"></i> ${l.reason}</div>`;})():''}
-        ${l.staff?`<div class="fi-reason"><i class="ti ti-user"></i> ${l.staff}</div>`:''}
-      </div>
-      <button class="fi-del" onclick="delLog(${l.id})"><i class="ti ti-x"></i></button>
-    </div>`;
-  }).join('');
-}
-
-function delLog(id){
-  logs=logs.filter(l=>l.id!==id);
-  saveData();renderFeed();updateSummary();updateReasonBars();
-}
-
-function clearFeed(){
-  if(!confirm('ล้างรายการทั้งหมดวันนี้?'))return;
-  logs=[];saveData();renderFeed();updateSummary();updateReasonBars();
-}
-
-function updateSummary(){
-  const t={contact:0,inquiry:0,register:0,deposit:0,nodeposit:0};
-  logs.forEach(l=>l.actions.forEach(a=>{if(t[a]!==undefined)t[a]++;}));
-  const decided=t.deposit+t.nodeposit;
-  const depRate=decided>0?Math.round(t.deposit/decided*100):0;
-  document.getElementById('sum-grid').innerHTML=`
-    <div class="sum-cell"><div class="sum-lbl">ทักเข้ามา</div><div class="sum-val" style="color:#3b82f6">${t.contact}</div></div>
-    <div class="sum-cell"><div class="sum-lbl">สอบถาม</div><div class="sum-val" style="color:#a855f7">${t.inquiry}</div></div>
-    <div class="sum-cell"><div class="sum-lbl">สมัคร</div><div class="sum-val" style="color:#f59e0b">${t.register}</div></div>
-    <div class="sum-cell"><div class="sum-lbl">ฝากแล้ว</div><div class="sum-val" style="color:#4caf81">${t.deposit}</div></div>
-    <div class="sum-cell"><div class="sum-lbl">ไม่ฝาก</div><div class="sum-val" style="color:#e05c5c">${t.nodeposit}</div></div>
-    <div class="sum-cell"><div class="sum-lbl">อัตราฝาก</div><div class="sum-val" style="color:#D4AF37">${depRate}%</div></div>`;
-  document.getElementById('rate-note').textContent=
-    decided>0?`${t.deposit} ÷ (${t.deposit}+${t.nodeposit}) = ${depRate}%`:'ยังไม่มีข้อมูลฝาก/ไม่ฝาก';
-}
-
-function updateReasonBars(){
-  const cnt={};
-  logs.forEach(l=>{if(l.reason)cnt[l.reason]=(cnt[l.reason]||0)+1;});
-  const wrap=document.getElementById('reason-bars');
-  const entries=Object.entries(cnt).sort((a,b)=>b[1]-a[1]);
-  if(!entries.length){wrap.innerHTML='<div style="font-size:12px;color:#333;padding:8px 0;">ยังไม่มีข้อมูล</div>';return;}
-  const max=entries[0][1];
-  const colorMap={};
-  reasons.forEach((r,i)=>{colorMap[rLabel(r)]=rColor(r,i);});
-  wrap.innerHTML=entries.map(([label,count])=>{
-    const color=colorMap[label]||'#e05c5c';
-    return`<div class="rbar-row">
-      <div class="rbar-name" title="${label}" style="color:${color}">${label}</div>
-      <div class="rbar-track"><div class="rbar-fill" style="width:${Math.round(count/max*100)}%;background:${color}"></div></div>
-      <div class="rbar-cnt" style="color:${color}">${count}</div>
-    </div>`;
-  }).join('');
-}
-
-const REASON_COLORS=['#f59e0b','#3b82f6','#888','#a855f7','#10b981','#e05c5c','#D4AF37','#06c755','#ff0050','#c084fc'];
-function rLabel(r){return typeof r==='object'?r.l:r;}
-function rColor(r,i){return typeof r==='object'?r.c:REASON_COLORS[i%REASON_COLORS.length];}
-
-function addReason(){
-  const inp=document.getElementById('new-reason');
-  const label=inp.value.trim();if(!label)return;
-  const color=REASON_COLORS[reasons.length%REASON_COLORS.length];
-  reasons.push({l:label,c:color});inp.value='';buildReasonSelect();saveData();
-}
-
-function buildReasonSelect(){
-  const sel=document.getElementById('reason-select');
-  sel.innerHTML='<option value="">— เลือกเหตุผล —</option>';
-  reasons.forEach((r,i)=>{
-    const o=document.createElement('option');
-    o.value=rLabel(r);o.textContent=rLabel(r);sel.appendChild(o);
-  });
-}
-
-function saveData(){
-  localStorage.setItem(lkey(),JSON.stringify(logs));
-  localStorage.setItem(rkey(),JSON.stringify(reasons));
-}
-
-function loadData(){
-  const raw=localStorage.getItem(lkey());logs=raw?JSON.parse(raw):[];
-  const rraw=localStorage.getItem(rkey());reasons=rraw?JSON.parse(rraw):[...DEFAULT_REASONS];
-  selected.clear();
-  buildChTabs();buildActionGrid();buildReasonSelect();renderFeed();updateSummary();updateReasonBars();
-}
-
-setInterval(()=>{document.getElementById('top-time').textContent=nowTime();},1000);
-document.getElementById('top-time').textContent=nowTime();
-document.getElementById('f-date').value=today();
-document.getElementById('f-date').addEventListener('change',loadData);
-document.getElementById('f-staff').addEventListener('change',loadData);
-loadData();
+function doLogout(){sessionStorage.removeItem('nc_auth');document.getElementById('login-screen').classList.add('show');}
+if(sessionStorage.getItem('nc_auth')!=='1'){document.getElementById('login-screen').classList.add('show');}
 </script>
 </body>
 </html>

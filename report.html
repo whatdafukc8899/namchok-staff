@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>NAMCHOK99 — รายงานสรุปผลรายวัน</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#0d0d0d;color:#f0f0f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;}
+#login-screen{position:fixed;inset:0;background:#0d0d0d;z-index:999;display:none;align-items:center;justify-content:center;padding:20px;}
+#login-screen.show{display:flex;}
+.login-box{background:#1a1a1a;border:.5px solid #2a2a2a;border-radius:16px;padding:28px 24px;width:100%;max-width:360px;}
+.login-logo{text-align:center;margin-bottom:6px;}
+.login-sub{font-size:11px;color:#555;text-align:center;margin-bottom:24px;}
+.login-lbl{font-size:11px;color:#888;margin-bottom:5px;}
+.login-inp{width:100%;background:#111;border:.5px solid #2a2a2a;color:#f0f0f0;border-radius:8px;padding:10px 12px;font-size:14px;margin-bottom:14px;}
+.login-inp:focus{outline:none;border-color:#D4AF37;}
+.login-btn{width:100%;background:#D4AF37;color:#0d0d0d;border:none;border-radius:8px;padding:11px;font-size:14px;font-weight:600;cursor:pointer;margin-top:4px;}
+.login-btn:active{opacity:.85;}
+.login-err{font-size:12px;color:#e05c5c;text-align:center;margin-top:10px;min-height:18px;}
+.wrap{max-width:480px;margin:0 auto;min-height:100vh;}
+.topbar{background:#1a1a1a;border-bottom:.5px solid #2a2a2a;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.topbar-logo{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:#D4AF37;}
+.tbr{display:flex;gap:6px;align-items:center;}
+.save-btn{background:#1a2a1a;border:.5px solid #2a4a2a;color:#4caf81;border-radius:8px;padding:6px 11px;font-size:12px;cursor:pointer;}
+.exp-btn{background:#1a1800;border:.5px solid #3a3000;color:#D4AF37;border-radius:8px;padding:6px 9px;font-size:12px;cursor:pointer;}
+.logout-btn{background:#2a1a1a;border:.5px solid #4a2a2a;color:#e05c5c;border-radius:8px;padding:6px 9px;font-size:12px;cursor:pointer;}
+#imp-file{display:none;}
+.body{padding:14px 16px;display:flex;flex-direction:column;gap:12px;}
+.date-card{background:#1a1a1a;border:.5px solid #2a2a2a;border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:10px;}
+.date-card label{font-size:11px;color:#888;white-space:nowrap;}
+.date-inp{background:#111;border:.5px solid #2a2a2a;color:#D4AF37;border-radius:8px;padding:8px 12px;font-size:14px;font-weight:500;flex:1;}
+.date-inp:focus{outline:none;border-color:#D4AF37;}
+.section-card{background:#1a1a1a;border:.5px solid #2a2a2a;border-radius:12px;overflow:hidden;}
+.section-head{padding:10px 14px;background:#151515;border-bottom:.5px solid #2a2a2a;font-size:11px;color:#888;}
+.field-row{display:grid;grid-template-columns:1fr 140px;align-items:center;gap:10px;padding:10px 14px;border-bottom:.5px solid #1a1a1a;}
+.field-row:last-child{border-bottom:none;}
+.field-lbl{font-size:13px;color:#ccc;}
+.field-lbl small{display:block;font-size:10px;color:#555;margin-top:1px;}
+.field-inp{background:#111;border:.5px solid #2a2a2a;color:#f0f0f0;border-radius:8px;padding:8px 10px;font-size:14px;text-align:right;width:100%;}
+.field-inp:focus{outline:none;border-color:#D4AF37;}
+.field-inp.int{text-align:right;}
+.field-auto{background:#0d0d0d;border:.5px solid #1e1e1e;color:#D4AF37;border-radius:8px;padding:8px 10px;font-size:14px;font-weight:600;text-align:right;width:100%;}
+.field-auto.green{color:#4caf81;}
+.field-auto.red{color:#e05c5c;}
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
+input[type=number]{-moz-appearance:textfield;}
+/* MONTHLY */
+.month-picker-row{display:flex;align-items:center;gap:8px;}
+.month-picker-row label{font-size:11px;color:#888;white-space:nowrap;}
+.month-inp{background:#111;border:.5px solid #2a2a2a;color:#D4AF37;border-radius:8px;padding:8px 12px;font-size:14px;flex:1;}
+.month-inp:focus{outline:none;border-color:#D4AF37;}
+.sum-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.sum-box{background:#111;border:.5px solid #2a2a2a;border-radius:10px;padding:12px;}
+.sum-box-lbl{font-size:10px;color:#888;margin-bottom:4px;}
+.sum-box-val{font-size:18px;font-weight:600;}
+.chart-wrap{background:#111;border-radius:10px;padding:12px;overflow-x:auto;}
+.chart-title{font-size:11px;color:#888;margin-bottom:10px;}
+.chart-svg{display:block;width:100%;overflow:visible;}
+/* RESULT */
+.result-card{background:#1a1a1a;border:.5px solid #2a2a2a;border-radius:12px;padding:16px;}
+.result-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:.5px solid #1e1e1e;}
+.result-row:last-child{border-bottom:none;margin-top:4px;padding-top:12px;}
+.result-lbl{font-size:13px;color:#888;}
+.result-val{font-size:16px;font-weight:600;}
+.result-val.green{color:#4caf81;}
+.result-val.red{color:#e05c5c;}
+.result-val.gold{color:#D4AF37;}
+.net-lbl{font-size:14px;color:#f0f0f0;font-weight:600;}
+.net-val{font-size:24px;font-weight:700;}
+/* HISTORY */
+.hist-card{background:#1a1a1a;border:.5px solid #2a2a2a;border-radius:12px;overflow:hidden;}
+.hist-head{padding:10px 14px;background:#151515;border-bottom:.5px solid #2a2a2a;font-size:11px;color:#888;}
+.hist-row{display:grid;grid-template-columns:90px 1fr 1fr 80px;gap:6px;padding:10px 14px;border-bottom:.5px solid #1a1a1a;cursor:pointer;}
+.hist-row:last-child{border-bottom:none;}
+.hist-row:active{background:#1e1e1e;}
+.hist-date{font-size:12px;color:#888;}
+.hist-val{font-size:12px;text-align:right;}
+.empty{text-align:center;padding:24px;font-size:12px;color:#333;}
+</style>
+</head>
+<body>
+
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo"><img src="logo.png" style="height:110px;width:auto;object-fit:contain;display:block;margin:0 auto 10px;"></div>
+    <div class="login-sub">รายงานสรุปผลรายวัน — เข้าสู่ระบบ</div>
+    <div class="login-lbl">Username</div>
+    <input class="login-inp" type="text" id="l-user" placeholder="username" autocomplete="username">
+    <div class="login-lbl">Password</div>
+    <input class="login-inp" type="password" id="l-pass" placeholder="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">เข้าสู่ระบบ</button>
+    <div class="login-err" id="l-err"></div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="topbar">
+    <a href="/" style="text-decoration:none;">
+      <div class="topbar-logo"><img src="logo.png" style="height:32px;width:auto;object-fit:contain;"> รายงานรายวัน</div>
+    </a>
+    <div class="tbr">
+      <button class="save-btn" onclick="saveDay()">💾 บันทึก</button>
+      <button class="exp-btn" onclick="exportData()">⬇️</button>
+      <button class="exp-btn" onclick="document.getElementById('imp-file').click()">⬆️</button>
+      <input type="file" id="imp-file" accept=".json" onchange="importData(event)">
+      <button class="logout-btn" onclick="doLogout()">🚪</button>
+    </div>
+  </div>
+
+  <div class="body">
+    <!-- DATE -->
+    <div class="date-card">
+      <label>วันที่</label>
+      <input class="date-inp" type="date" id="f-date" onchange="loadDay()">
+    </div>
+
+    <!-- ลูกค้า -->
+    <div class="section-card">
+      <div class="section-head">ข้อมูลลูกค้า</div>
+      <div class="field-row">
+        <div class="field-lbl">New User</div>
+        <input class="field-inp" type="number" id="r1" placeholder="0" oninput="calc()">
+      </div>
+      <div class="field-row">
+        <div class="field-lbl">ลูกค้าฝากแรก</div>
+        <input class="field-inp" type="number" id="r2" placeholder="0" oninput="calc()">
+      </div>
+      <div class="field-row">
+        <div class="field-lbl">DAU</div>
+        <input class="field-inp" type="number" id="r9" placeholder="0" oninput="calc()">
+      </div>
+    </div>
+
+    <!-- ยอด -->
+    <div class="section-card">
+      <div class="section-head">ยอดฝาก / ถอน</div>
+      <div class="field-row">
+        <div class="field-lbl">ยอดฝากแรก</div>
+        <input class="field-inp" type="number" id="r3" placeholder="0" oninput="calc()">
+      </div>
+      <div class="field-row">
+        <div class="field-lbl">ยอดฝากรวม</div>
+        <input class="field-inp" type="number" id="r4" placeholder="0" oninput="calc()">
+      </div>
+      <div class="field-row">
+        <div class="field-lbl">ยอดถอนรวม</div>
+        <input class="field-inp" type="number" id="r5" placeholder="0" oninput="calc()">
+      </div>
+      <div class="field-row">
+        <div class="field-lbl">หักลบเงินสด<small>= ยอดฝากรวม − ยอดถอนรวม (auto)</small></div>
+        <div class="field-auto" id="r6">0</div>
+      </div>
+    </div>
+
+    <!-- ค่าใช้จ่าย -->
+    <div class="section-card">
+      <div class="section-head">ค่าใช้จ่าย</div>
+      <div class="field-row">
+        <div class="field-lbl">หน้า AG</div>
+        <input class="field-inp" type="number" id="r7" placeholder="0" oninput="calc()">
+      </div>
+      <div class="field-row">
+        <div class="field-lbl">โบนัส</div>
+        <input class="field-inp" type="number" id="r8" placeholder="0" oninput="calc()">
+      </div>
+      <div class="field-row">
+        <div class="field-lbl">Company</div>
+        <input class="field-inp" type="number" id="r10" placeholder="0" oninput="calc()">
+      </div>
+    </div>
+
+    <!-- สรุป -->
+    <div class="result-card">
+      <div class="result-row">
+        <span class="result-lbl">หักลบเงินสด</span>
+        <span class="result-val gold" id="res-cash">฿0</span>
+      </div>
+      <div class="result-row">
+        <span class="result-lbl">โบนัส</span>
+        <span class="result-val" style="color:#888;" id="res-bonus">฿0</span>
+      </div>
+      <div class="result-row">
+        <span class="result-lbl">Company</span>
+        <span class="result-val" style="color:#888;" id="res-company">฿0</span>
+      </div>
+      <div class="result-row big-result">
+        <span class="net-lbl">กำไร/ขาดทุนสุทธิ</span>
+        <span class="net-val" id="res-net">฿0</span>
+      </div>
+    </div>
+
+    <!-- MONTHLY VIEW -->
+    <div class="section-card">
+      <div class="section-head">📅 สรุปรายเดือน</div>
+      <div style="padding:12px;display:flex;flex-direction:column;gap:12px;">
+        <div class="month-picker-row">
+          <label>เดือน</label>
+          <input class="month-inp" type="month" id="m-pick" onchange="renderMonthly()">
+        </div>
+        <div class="sum-grid">
+          <div class="sum-box"><div class="sum-box-lbl">New User รวม</div><div class="sum-box-val" style="color:#D4AF37;" id="ms-user">0 คน</div></div>
+          <div class="sum-box"><div class="sum-box-lbl">DAU เฉลี่ย</div><div class="sum-box-val" style="color:#5DBBFF;" id="ms-dau">0 คน</div></div>
+          <div class="sum-box"><div class="sum-box-lbl">ยอดฝากรวม</div><div class="sum-box-val" style="color:#4caf81;" id="ms-dep">฿0</div></div>
+          <div class="sum-box"><div class="sum-box-lbl">ยอดถอนรวม</div><div class="sum-box-val" style="color:#e05c5c;" id="ms-wit">฿0</div></div>
+          <div class="sum-box"><div class="sum-box-lbl">โบนัสรวม</div><div class="sum-box-val" style="color:#888;" id="ms-bon">฿0</div></div>
+          <div class="sum-box"><div class="sum-box-lbl">กำไร/ขาดทุนรวม</div><div class="sum-box-val" id="ms-net">฿0</div></div>
+        </div>
+        <div class="chart-wrap">
+          <div class="chart-title">กำไร/ขาดทุนสุทธิ รายวัน (฿)</div>
+          <svg class="chart-svg" id="rep-chart" height="160"></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- HISTORY -->
+    <div class="hist-card">
+      <div class="hist-head">ประวัติที่บันทึกไว้</div>
+      <div id="hist-list"><div class="empty">ยังไม่มีข้อมูล</div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const USERS=[{user:'admin',pass:'namchok99'},{user:'manager',pass:'nc2026'}];
+const KEY='nc_report_v1';
+
+function doLogin(){
+  const u=document.getElementById('l-user').value.trim();
+  const p=document.getElementById('l-pass').value;
+  const ok=USERS.find(x=>x.user===u&&x.pass===p);
+  if(ok){sessionStorage.setItem('nc_auth','1');document.getElementById('login-screen').classList.remove('show');}
+  else{document.getElementById('l-err').textContent='Username หรือ Password ไม่ถูกต้อง';document.getElementById('l-pass').value='';}
+}
+function doLogout(){sessionStorage.removeItem('nc_auth');document.getElementById('login-screen').classList.add('show');}
+if(sessionStorage.getItem('nc_auth')!=='1'){document.getElementById('login-screen').classList.add('show');}
+
+function n(id){return parseFloat(document.getElementById(id).value)||0;}
+function fmt(v){return'฿'+v.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});}
+
+function setAuto(id,val){
+  const el=document.getElementById(id);
+  el.textContent=fmt(val);
+  el.className='field-auto'+(val>0?' green':val<0?' red':'');
+}
+
+function calc(){
+  const r6=n('r4')-n('r5');
+  const net=r6-n('r8')-n('r10');
+  setAuto('r6',r6);
+  document.getElementById('res-cash').textContent=fmt(r6);
+  document.getElementById('res-bonus').textContent=fmt(n('r8'));
+  document.getElementById('res-company').textContent=fmt(n('r10'));
+  const netEl=document.getElementById('res-net');
+  netEl.textContent=fmt(net);
+  netEl.className='net-val'+(net>0?' green':net<0?' red':'');
+}
+
+function loadData(){return JSON.parse(localStorage.getItem(KEY)||'{}');}
+function saveData(d){localStorage.setItem(KEY,JSON.stringify(d));}
+
+function loadDay(){
+  const date=document.getElementById('f-date').value;
+  if(!date)return;
+  const day=loadData()[date]||{};
+  ['r1','r2','r3','r4','r5','r7','r8','r9','r10'].forEach(id=>{
+    document.getElementById(id).value=day[id]||'';
+  });
+  calc();
+}
+
+function saveDay(){
+  const date=document.getElementById('f-date').value;
+  if(!date){alert('กรุณาเลือกวันที่');return;}
+  const r6=n('r4')-n('r5');
+  const net=r6-n('r8')-n('r10');
+  const data=loadData();
+  data[date]={r1:n('r1'),r2:n('r2'),r3:n('r3'),r4:n('r4'),r5:n('r5'),r6,r7:n('r7'),r8:n('r8'),r9:n('r9'),r10:n('r10'),net};
+  saveData(data);
+  renderHist();
+  alert('บันทึกแล้ว ✅');
+}
+
+function renderHist(){
+  const data=loadData();
+  const keys=Object.keys(data).sort((a,b)=>b.localeCompare(a));
+  const el=document.getElementById('hist-list');
+  if(!keys.length){el.innerHTML='<div class="empty">ยังไม่มีข้อมูล</div>';return;}
+  el.innerHTML=`<div class="hist-row" style="cursor:default;border-bottom:.5px solid #2a2a2a;">
+    <div class="hist-date" style="color:#555;font-size:10px;">วันที่</div>
+    <div class="hist-val" style="color:#555;font-size:10px;">ยอดฝาก</div>
+    <div class="hist-val" style="color:#555;font-size:10px;">ยอดถอน</div>
+    <div class="hist-val" style="color:#555;font-size:10px;">กำไร/ขาดทุน</div>
+  </div>`+keys.map(k=>{
+    const d=data[k];
+    const netColor=d.net>0?'#4caf81':d.net<0?'#e05c5c':'#888';
+    return`<div class="hist-row" onclick="loadFromHist('${k}')">
+      <div class="hist-date">${k}</div>
+      <div class="hist-val" style="color:#f0f0f0;">฿${(d.r4||0).toLocaleString()}</div>
+      <div class="hist-val" style="color:#e05c5c;">฿${(d.r5||0).toLocaleString()}</div>
+      <div class="hist-val" style="color:${netColor};font-weight:600;">฿${(d.net||0).toLocaleString()}</div>
+    </div>`;
+  }).join('');
+}
+
+function loadFromHist(date){
+  document.getElementById('f-date').value=date;
+  loadDay();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function exportData(){
+  const blob=new Blob([JSON.stringify(loadData(),null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`nc_report_backup_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+}
+
+function importData(e){
+  const file=e.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const data=JSON.parse(ev.target.result);
+      saveData(data);
+      renderHist();
+      alert('นำเข้าสำเร็จ ✅');
+    }catch{alert('ไฟล์ไม่ถูกต้อง');}
+  };
+  reader.readAsText(file);
+  e.target.value='';
+}
+
+function renderMonthly(){
+  const ym=document.getElementById('m-pick').value;
+  if(!ym)return;
+  const data=loadData();
+  const days=Object.keys(data).filter(k=>k.startsWith(ym)).sort();
+  let totUser=0,totDep=0,totWit=0,totBon=0,totNet=0,totDau=0;
+  days.forEach(k=>{
+    const d=data[k];
+    totUser+=d.r1||0;totDep+=d.r4||0;totWit+=d.r5||0;
+    totBon+=d.r8||0;totNet+=d.net||0;totDau+=d.r9||0;
+  });
+  const fmt2=v=>'฿'+v.toLocaleString('th-TH',{minimumFractionDigits:0,maximumFractionDigits:0});
+  document.getElementById('ms-user').textContent=totUser+' คน';
+  document.getElementById('ms-dau').textContent=days.length?Math.round(totDau/days.length)+' คน':'0 คน';
+  document.getElementById('ms-dep').textContent=fmt2(totDep);
+  document.getElementById('ms-wit').textContent=fmt2(totWit);
+  document.getElementById('ms-bon').textContent=fmt2(totBon);
+  const netEl=document.getElementById('ms-net');
+  netEl.textContent=fmt2(totNet);
+  netEl.style.color=totNet>0?'#4caf81':totNet<0?'#e05c5c':'#888';
+
+  // chart
+  const svg=document.getElementById('rep-chart');
+  if(!days.length){svg.innerHTML='<text x="50%" y="80" text-anchor="middle" fill="#333" font-size="12">ไม่มีข้อมูลในเดือนนี้</text>';return;}
+  const vals=days.map(k=>data[k].net||0);
+  const maxAbs=Math.max(...vals.map(v=>Math.abs(v)),1);
+  const W=svg.parentElement.clientWidth-24;
+  const H=165;const PT=18;const PB=18;const barH=H-PB-PT;
+  const bw=Math.max(8,Math.floor((W-days.length*2)/days.length));
+  const totalW=days.length*(bw+2);
+  svg.setAttribute('viewBox',`0 0 ${Math.max(totalW,W)} ${H}`);
+  svg.setAttribute('width',Math.max(totalW,W));
+  svg.innerHTML=vals.map((v,i)=>{
+    const x=i*(bw+2);
+    const h=Math.round((Math.abs(v)/maxAbs)*(barH*0.9));
+    const y=v>=0?PT+barH-h:PT+barH;
+    const color=v>0?'#4caf81':v<0?'#e05c5c':'#555';
+    const day=days[i].slice(8);
+    const label=Math.abs(v)>=1000?(v/1000).toFixed(1).replace('.0','')+'K':v!==0?Math.round(v):'';
+    const labelY=v>=0?y-5:y+Math.max(h,2)+12;
+    return`<rect x="${x}" y="${y}" width="${bw}" height="${Math.max(h,2)}" fill="${color}" rx="2"/>
+<text x="${x+bw/2}" y="${labelY}" text-anchor="middle" fill="${color}" font-size="10" font-weight="600">${label}</text>
+<text x="${x+bw/2}" y="${H-4}" text-anchor="middle" fill="#555" font-size="9">${day}</text>`;
+  }).join('')+`<line x1="0" y1="${barH}" x2="${Math.max(totalW,W)}" y2="${barH}" stroke="#2a2a2a" stroke-width="1"/>`;
+}
+
+const today=new Date().toISOString().slice(0,10);
+document.getElementById('f-date').value=today;
+document.getElementById('m-pick').value=today.slice(0,7);
+loadDay();
+renderHist();
+renderMonthly();
+</script>
+</body>
+</html>

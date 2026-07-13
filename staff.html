@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>NAMCHOK99 — ข้อมูลพนักงาน</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#0d0d0d;color:#f0f0f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;}
+/* LOGIN */
+#login-screen{position:fixed;inset:0;background:#0d0d0d;z-index:999;display:none;align-items:center;justify-content:center;padding:20px;}
+#login-screen.show{display:flex;}
+.login-box{background:#1a1a1a;border:.5px solid #2a2a2a;border-radius:16px;padding:28px 24px;width:100%;max-width:360px;}
+.login-logo{text-align:center;margin-bottom:6px;}
+.login-sub{font-size:11px;color:#555;text-align:center;margin-bottom:24px;}
+.login-lbl{font-size:11px;color:#888;margin-bottom:5px;}
+.login-inp{width:100%;background:#111;border:.5px solid #2a2a2a;color:#f0f0f0;border-radius:8px;padding:10px 12px;font-size:14px;margin-bottom:14px;}
+.login-inp:focus{outline:none;border-color:#D4AF37;}
+.login-btn{width:100%;background:#D4AF37;color:#0d0d0d;border:none;border-radius:8px;padding:11px;font-size:14px;font-weight:600;cursor:pointer;margin-top:4px;}
+.login-btn:active{opacity:.85;}
+.login-err{font-size:12px;color:#e05c5c;text-align:center;margin-top:10px;min-height:18px;}
+/* MAIN */
+.wrap{max-width:480px;margin:0 auto;min-height:100vh;}
+.topbar{background:#1a1a1a;border-bottom:.5px solid #2a2a2a;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.topbar-logo{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:#D4AF37;}
+.logout-btn{background:#2a1a1a;border:.5px solid #4a2a2a;color:#e05c5c;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;}
+.exp-btn{background:#1a1800;border:.5px solid #3a3000;color:#D4AF37;border-radius:8px;padding:6px 9px;font-size:12px;cursor:pointer;}
+#imp-file{display:none;}
+.body{padding:14px 16px;display:flex;flex-direction:column;gap:12px;}
+/* FORM */
+.form-card{background:#1a1a1a;border:.5px solid #2a2a2a;border-radius:12px;padding:16px;}
+.form-title{font-size:12px;color:#888;margin-bottom:14px;display:flex;align-items:center;gap:6px;}
+.form-title span{color:#D4AF37;}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
+.field:last-of-type{margin-bottom:0;}
+.field label{font-size:11px;color:#888;}
+.field input,.field select{background:#111;border:.5px solid #2a2a2a;color:#f0f0f0;border-radius:8px;padding:9px 12px;font-size:14px;width:100%;}
+.field input:focus,.field select:focus{outline:none;border-color:#D4AF37;}
+.field select option{background:#1a1a1a;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.add-btn{width:100%;background:#D4AF37;color:#0d0d0d;border:none;border-radius:8px;padding:10px;font-size:14px;font-weight:600;cursor:pointer;margin-top:14px;}
+.add-btn:active{opacity:.85;}
+/* COUNT */
+.count-row{display:flex;align-items:center;justify-content:space-between;}
+.count-lbl{font-size:12px;color:#888;}
+.count-num{font-size:18px;font-weight:600;color:#D4AF37;}
+/* LIST */
+.staff-list{display:flex;flex-direction:column;gap:8px;}
+.staff-card{background:#1a1a1a;border:.5px solid #2a2a2a;border-radius:12px;padding:14px 14px 12px;position:relative;}
+.staff-card:active{background:#1e1e1e;}
+.staff-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px;}
+.staff-name{font-size:15px;font-weight:600;color:#f0f0f0;}
+.staff-nick{font-size:12px;color:#888;margin-top:2px;}
+.staff-actions{display:flex;gap:6px;flex-shrink:0;}
+.edit-btn{background:#1a1800;border:.5px solid #3a3000;color:#D4AF37;border-radius:7px;padding:5px 10px;font-size:12px;cursor:pointer;}
+.del-btn{background:#2a1010;border:.5px solid #4a2020;color:#e05c5c;border-radius:7px;padding:5px 9px;font-size:12px;cursor:pointer;}
+.staff-info{display:flex;flex-wrap:wrap;gap:6px;}
+.info-pill{display:inline-flex;align-items:center;gap:4px;background:#111;border:.5px solid #2a2a2a;border-radius:6px;padding:4px 9px;font-size:11px;color:#bbb;}
+.info-pill.phone{color:#5DBBFF;}
+.info-pill.pos{color:#D4AF37;}
+.info-pill.shift-morning{color:#4caf81;}
+.info-pill.shift-night{color:#5DBBFF;}
+.empty-state{text-align:center;padding:40px 20px;color:#333;font-size:13px;}
+/* MODAL EDIT */
+#edit-modal{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;}
+#edit-modal.show{display:flex;}
+.modal-box{background:#1a1a1a;border:.5px solid #2a2a2a;border-radius:14px;padding:20px;width:100%;max-width:400px;max-height:90vh;overflow-y:auto;}
+.modal-title{font-size:14px;font-weight:600;color:#D4AF37;margin-bottom:16px;}
+.modal-actions{display:flex;gap:8px;margin-top:16px;}
+.modal-save{flex:1;background:#D4AF37;color:#0d0d0d;border:none;border-radius:8px;padding:10px;font-size:14px;font-weight:600;cursor:pointer;}
+.modal-cancel{background:#2a2a2a;color:#888;border:none;border-radius:8px;padding:10px 16px;font-size:14px;cursor:pointer;}
+</style>
+</head>
+<body>
+
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo"><img src="logo.png" style="height:110px;width:auto;object-fit:contain;display:block;margin:0 auto 10px;"></div>
+    <div class="login-sub">ข้อมูลพนักงาน — เข้าสู่ระบบ</div>
+    <div class="login-lbl">Username</div>
+    <input class="login-inp" type="text" id="l-user" placeholder="username" autocomplete="username">
+    <div class="login-lbl">Password</div>
+    <input class="login-inp" type="password" id="l-pass" placeholder="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">เข้าสู่ระบบ</button>
+    <div class="login-err" id="l-err"></div>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div id="edit-modal">
+  <div class="modal-box">
+    <div class="modal-title">✏️ แก้ไขข้อมูลพนักงาน</div>
+    <div class="field"><label>ชื่อ</label><input id="e-fname" type="text" placeholder="ชื่อ"></div>
+    <div class="field"><label>นามสกุล</label><input id="e-lname" type="text" placeholder="นามสกุล"></div>
+    <div class="field"><label>ชื่อเล่น</label><input id="e-nick" type="text" placeholder="ชื่อเล่น"></div>
+    <div class="field"><label>เบอร์ติดต่อ</label><input id="e-phone" type="tel" placeholder="0xx-xxx-xxxx"></div>
+    <div class="field"><label>ตำแหน่ง</label>
+      <select id="e-pos">
+        <option value="">— เลือกตำแหน่ง —</option>
+        <option>Admin</option>
+        <option>CS</option>
+        <option>Marketing</option>
+        <option>Finance</option>
+        <option>Manager</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>วันเริ่มงาน</label><input id="e-start" type="date"></div>
+      <div class="field"><label>กะ</label>
+        <select id="e-shift">
+          <option value="">— กะ —</option>
+          <option>เช้า</option>
+          <option>ดึก</option>
+          <option>สำรอง</option>
+        </select>
+      </div>
+    </div>
+    <div class="field"><label>เงินเดือน (฿)</label><input id="e-salary" type="number" placeholder="0"></div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeEdit()">ยกเลิก</button>
+      <button class="modal-save" onclick="saveEdit()">บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="topbar">
+    <a href="/" style="text-decoration:none;">
+      <div class="topbar-logo"><img src="logo.png" style="height:32px;width:auto;object-fit:contain;"> ข้อมูลพนักงาน</div>
+    </a>
+    <div style="display:flex;gap:6px;align-items:center;">
+      <button class="exp-btn" onclick="exportData()" title="Export backup">⬇️</button>
+      <button class="exp-btn" onclick="document.getElementById('imp-file').click()" title="Import backup">⬆️</button>
+      <input type="file" id="imp-file" accept=".json" onchange="importData(event)">
+      <button class="logout-btn" onclick="doLogout()">🚪</button>
+    </div>
+  </div>
+
+  <div class="body">
+    <!-- FORM เพิ่มพนักงาน -->
+    <div class="form-card">
+      <div class="form-title">➕ เพิ่มพนักงานใหม่</div>
+      <div class="field-row">
+        <div class="field"><label>ชื่อ *</label><input id="f-fname" type="text" placeholder="ชื่อ"></div>
+        <div class="field"><label>นามสกุล</label><input id="f-lname" type="text" placeholder="นามสกุล"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>ชื่อเล่น</label><input id="f-nick" type="text" placeholder="ชื่อเล่น"></div>
+        <div class="field"><label>เบอร์ติดต่อ</label><input id="f-phone" type="tel" placeholder="0xx-xxx-xxxx"></div>
+      </div>
+      <div class="field">
+        <label>ตำแหน่ง</label>
+        <select id="f-pos">
+          <option value="">— เลือกตำแหน่ง —</option>
+          <option>Admin</option>
+          <option>CS</option>
+          <option>Marketing</option>
+          <option>Finance</option>
+          <option>Manager</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>วันเริ่มงาน</label><input id="f-start" type="date"></div>
+        <div class="field"><label>กะ</label>
+          <select id="f-shift">
+            <option value="">— กะ —</option>
+            <option>เช้า</option>
+            <option>ดึก</option>
+            <option>สำรอง</option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><label>เงินเดือน (฿)</label><input id="f-salary" type="number" placeholder="0"></div>
+      <button class="add-btn" onclick="addStaff()">+ เพิ่มพนักงาน</button>
+    </div>
+
+    <!-- COUNT -->
+    <div class="count-row">
+      <span class="count-lbl">พนักงานทั้งหมด</span>
+      <span class="count-num" id="count">0 คน</span>
+    </div>
+
+    <!-- LIST -->
+    <div class="staff-list" id="staff-list"></div>
+  </div>
+</div>
+
+<script>
+const USERS=[{user:'admin',pass:'namchok99'},{user:'manager',pass:'nc2026'}];
+const KEY='nc_staff_v1';
+let editId=null;
+
+function doLogin(){
+  const u=document.getElementById('l-user').value.trim();
+  const p=document.getElementById('l-pass').value;
+  const ok=USERS.find(x=>x.user===u&&x.pass===p);
+  if(ok){sessionStorage.setItem('nc_auth','1');document.getElementById('login-screen').classList.remove('show');}
+  else{document.getElementById('l-err').textContent='Username หรือ Password ไม่ถูกต้อง';document.getElementById('l-pass').value='';}
+}
+function doLogout(){sessionStorage.removeItem('nc_auth');document.getElementById('login-screen').classList.add('show');}
+if(sessionStorage.getItem('nc_auth')!=='1'){document.getElementById('login-screen').classList.add('show');}
+
+function load(){return JSON.parse(localStorage.getItem(KEY)||'[]');}
+function save(d){localStorage.setItem(KEY,JSON.stringify(d));}
+
+function formatDate(s){
+  if(!s)return'';
+  const d=new Date(s);
+  return d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'2-digit'});
+}
+
+function addStaff(){
+  const fname=document.getElementById('f-fname').value.trim();
+  if(!fname){alert('กรุณากรอกชื่อ');return;}
+  const staff={
+    id:Date.now(),
+    fname,
+    lname:document.getElementById('f-lname').value.trim(),
+    nick:document.getElementById('f-nick').value.trim(),
+    phone:document.getElementById('f-phone').value.trim(),
+    pos:document.getElementById('f-pos').value,
+    start:document.getElementById('f-start').value,
+    shift:document.getElementById('f-shift').value,
+    salary:document.getElementById('f-salary').value,
+  };
+  const data=load();
+  data.unshift(staff);
+  save(data);
+  ['f-fname','f-lname','f-nick','f-phone','f-salary'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-pos').value='';
+  document.getElementById('f-start').value='';
+  document.getElementById('f-shift').value='';
+  render();
+}
+
+function deleteStaff(id){
+  if(!confirm('ลบข้อมูลพนักงานคนนี้?'))return;
+  save(load().filter(x=>x.id!==id));
+  render();
+}
+
+function openEdit(id){
+  const s=load().find(x=>x.id===id);
+  if(!s)return;
+  editId=id;
+  document.getElementById('e-fname').value=s.fname||'';
+  document.getElementById('e-lname').value=s.lname||'';
+  document.getElementById('e-nick').value=s.nick||'';
+  document.getElementById('e-phone').value=s.phone||'';
+  document.getElementById('e-pos').value=s.pos||'';
+  document.getElementById('e-start').value=s.start||'';
+  document.getElementById('e-shift').value=s.shift||'';
+  document.getElementById('e-salary').value=s.salary||'';
+  document.getElementById('edit-modal').classList.add('show');
+}
+
+function closeEdit(){
+  editId=null;
+  document.getElementById('edit-modal').classList.remove('show');
+}
+
+function saveEdit(){
+  if(!editId)return;
+  const fname=document.getElementById('e-fname').value.trim();
+  if(!fname){alert('กรุณากรอกชื่อ');return;}
+  const data=load();
+  const idx=data.findIndex(x=>x.id===editId);
+  if(idx===-1)return;
+  data[idx]={...data[idx],
+    fname,
+    lname:document.getElementById('e-lname').value.trim(),
+    nick:document.getElementById('e-nick').value.trim(),
+    phone:document.getElementById('e-phone').value.trim(),
+    pos:document.getElementById('e-pos').value,
+    start:document.getElementById('e-start').value,
+    shift:document.getElementById('e-shift').value,
+    salary:document.getElementById('e-salary').value,
+  };
+  save(data);
+  closeEdit();
+  render();
+}
+
+function exportData(){
+  const data=load();
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`nc_staff_backup_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+}
+
+function importData(e){
+  const file=e.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const data=JSON.parse(ev.target.result);
+      if(!Array.isArray(data))throw new Error();
+      save(data);
+      alert('นำเข้าสำเร็จ '+data.length+' คน ✅');
+      render();
+    }catch{alert('ไฟล์ไม่ถูกต้อง');}
+  };
+  reader.readAsText(file);
+  e.target.value='';
+}
+
+function render(){
+  const data=load();
+  document.getElementById('count').textContent=data.length+' คน';
+  const el=document.getElementById('staff-list');
+  if(!data.length){
+    el.innerHTML='<div class="empty-state">ยังไม่มีข้อมูลพนักงาน<br>กรอกแบบฟอร์มด้านบนเพื่อเพิ่ม</div>';
+    return;
+  }
+  el.innerHTML=data.map(s=>{
+    const shiftClass=s.shift==='เช้า'?'shift-morning':s.shift==='ดึก'?'shift-night':'';
+    return`<div class="staff-card">
+      <div class="staff-top">
+        <div>
+          <div class="staff-name">${s.fname}${s.lname?' '+s.lname:''}</div>
+          ${s.nick?`<div class="staff-nick">"${s.nick}"</div>`:''}
+        </div>
+        <div class="staff-actions">
+          <button class="edit-btn" onclick="openEdit(${s.id})">แก้ไข</button>
+          <button class="del-btn" onclick="deleteStaff(${s.id})">🗑</button>
+        </div>
+      </div>
+      <div class="staff-info">
+        ${s.phone?`<span class="info-pill phone">📞 ${s.phone}</span>`:''}
+        ${s.pos?`<span class="info-pill pos">💼 ${s.pos}</span>`:''}
+        ${s.shift?`<span class="info-pill ${shiftClass}">🕐 ${s.shift}</span>`:''}
+        ${s.start?`<span class="info-pill">📅 ${formatDate(s.start)}</span>`:''}
+        ${s.salary?`<span class="info-pill" style="color:#4caf81;">💰 ฿${Number(s.salary).toLocaleString()}</span>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+render();
+</script>
+</body>
+</html>
