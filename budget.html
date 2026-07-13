@@ -175,7 +175,23 @@ input[type=number]{-moz-appearance:textfield;}
 </div>
 </div>
 
-<script>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js';
+import { getDatabase, ref, set, get } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCus5LIZm3VcDV7tWAxI0T4oOr229hWTlM",
+  authDomain: "namchok99dash.firebaseapp.com",
+  databaseURL: "https://namchok99dash-default-rtdb.firebaseio.com",
+  projectId: "namchok99dash",
+  storageBucket: "namchok99dash.firebasestorage.app",
+  messagingSenderId: "168525700910",
+  appId: "1:168525700910:web:7592d9fa28c3dd36b3a4bf"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
 const USERS=[
   {user:'admin',pass:'namchok99'},
   {user:'manager',pass:'nc2026'},
@@ -206,14 +222,10 @@ const curYear=2026;
 let expenses=[];
 
 function fmt(n){return Math.round(n).toLocaleString();}
-function skey(m){return`nc_budget_${curYear}_${m}`;}
 
-function exportData(){
-  const all={};
-  for(let i=0;i<localStorage.length;i++){
-    const k=localStorage.key(i);
-    if(k.startsWith('nc_budget_'))all[k]=localStorage.getItem(k);
-  }
+async function exportData(){
+  const snap=await get(ref(db,'budget/2026'));
+  const all=snap.val()||{};
   const blob=new Blob([JSON.stringify(all,null,2)],{type:'application/json'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
@@ -228,12 +240,10 @@ function importData(e){
   reader.onload=ev=>{
     try{
       const data=JSON.parse(ev.target.result);
-      let count=0;
-      Object.entries(data).forEach(([k,v])=>{
-        if(k.startsWith('nc_budget_')){localStorage.setItem(k,v);count++;}
+      set(ref(db,'budget/2026'),data).then(()=>{
+        alert('นำเข้าสำเร็จ ✅');
+        loadData();
       });
-      alert('นำเข้าสำเร็จ '+count+' เดือน ✅');
-      loadMonth();
     }catch{alert('ไฟล์ไม่ถูกต้อง');}
   };
   reader.readAsText(file);
@@ -294,7 +304,6 @@ function updateAmt(i,val){
 
 function renderList(){
   const wrap=document.getElementById('exp-list');
-  const empty=document.getElementById('empty-msg');
   if(!expenses.length){
     wrap.innerHTML='<div class="empty-exp" id="empty-msg"><i class="ti ti-mood-happy"></i><br>ยังไม่มีรายจ่าย</div>';
     return;
@@ -329,22 +338,27 @@ function markUnsaved(){
 
 function saveData(){
   const cap=parseFloat(document.getElementById('capital').value)||0;
-  localStorage.setItem(skey(curMonth),JSON.stringify({cap,expenses}));
-  document.getElementById('sdot').style.background='#4caf81';
-  document.getElementById('stxt').textContent='บันทึกแล้ว '+new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('sdot').style.background='#D4AF37';
+  document.getElementById('stxt').textContent='กำลังบันทึก...';
+  set(ref(db,`budget/2026/${curMonth}`),{cap,expenses}).then(()=>{
+    document.getElementById('sdot').style.background='#4caf81';
+    document.getElementById('stxt').textContent='ซิงค์แล้ว ✓ '+new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
+  });
 }
 
-function loadData(){
-  const raw=localStorage.getItem(skey(curMonth));
+async function loadData(){
+  document.getElementById('sdot').style.background='#555';
+  document.getElementById('stxt').textContent='กำลังโหลด...';
+  const snap=await get(ref(db,`budget/2026/${curMonth}`));
+  const d=snap.val();
   expenses=[];
-  if(!raw){
+  if(!d){
     document.getElementById('capital').value='';
     renderList();recalc();
     document.getElementById('sdot').style.background='#555';
     document.getElementById('stxt').textContent='ยังไม่มีข้อมูล — พร้อมบันทึก';
     return;
   }
-  const d=JSON.parse(raw);
   document.getElementById('capital').value=d.cap||'';
   expenses=d.expenses||[];
   renderList();recalc();
@@ -354,9 +368,25 @@ function loadData(){
 
 function clearData(){
   if(!confirm('ลบข้อมูลเดือน '+MONTHS[curMonth]+' '+curYear+'?'))return;
-  localStorage.removeItem(skey(curMonth));
-  loadData();
+  set(ref(db,`budget/2026/${curMonth}`),null).then(()=>{
+    loadData();
+  });
 }
+
+// Expose to window for onclick handlers
+window.doLogin=doLogin;
+window.doLogout=doLogout;
+window.saveData=saveData;
+window.clearData=clearData;
+window.exportData=exportData;
+window.importData=importData;
+window.toggleMD=toggleMD;
+window.setPreset=setPreset;
+window.addExp=addExp;
+window.delExp=delExp;
+window.updateAmt=updateAmt;
+window.recalc=recalc;
+window.markUnsaved=markUnsaved;
 
 buildMD();
 updateML();

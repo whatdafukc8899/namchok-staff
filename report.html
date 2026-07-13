@@ -77,6 +77,9 @@ input[type=number]{-moz-appearance:textfield;}
 .hist-date{font-size:12px;color:#888;}
 .hist-val{font-size:12px;text-align:right;}
 .empty{text-align:center;padding:24px;font-size:12px;color:#333;}
+/* SYNC STATUS */
+.sync-bar{display:flex;align-items:center;gap:5px;padding:4px 16px;font-size:11px;color:#666;background:#0d0d0d;}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:#555;flex-shrink:0;}
 </style>
 </head>
 <body>
@@ -107,6 +110,7 @@ input[type=number]{-moz-appearance:textfield;}
       <button class="logout-btn" onclick="doLogout()">🚪</button>
     </div>
   </div>
+  <div class="sync-bar"><span class="sync-dot" id="sync-dot"></span><span id="sync-txt">กำลังเชื่อมต่อ...</span></div>
 
   <div class="body">
     <!-- DATE -->
@@ -221,9 +225,35 @@ input[type=number]{-moz-appearance:textfield;}
   </div>
 </div>
 
-<script>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js';
+import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCus5LIZm3VcDV7tWAxI0T4oOr229hWTlM",
+  authDomain: "namchok99dash.firebaseapp.com",
+  databaseURL: "https://namchok99dash-default-rtdb.firebaseio.com",
+  projectId: "namchok99dash",
+  storageBucket: "namchok99dash.firebasestorage.app",
+  messagingSenderId: "168525700910",
+  appId: "1:168525700910:web:7592d9fa28c3dd36b3a4bf"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+let allData = {};
+
+// Keep in sync with Firebase
+onValue(ref(db,'report'), snap => {
+  allData = snap.val() || {};
+  document.getElementById('sync-dot').style.background='#4caf81';
+  document.getElementById('sync-txt').textContent='ซิงค์แล้ว ✓';
+  renderHist();
+  renderMonthly();
+});
+
 const USERS=[{user:'admin',pass:'namchok99'},{user:'manager',pass:'nc2026'}];
-const KEY='nc_report_v1';
 
 function doLogin(){
   const u=document.getElementById('l-user').value.trim();
@@ -256,13 +286,18 @@ function calc(){
   netEl.className='net-val'+(net>0?' green':net<0?' red':'');
 }
 
-function loadData(){return JSON.parse(localStorage.getItem(KEY)||'{}');}
-function saveData(d){localStorage.setItem(KEY,JSON.stringify(d));}
+function loadData(){return allData;}
+function saveData(d){
+  return set(ref(db,'report'),d).then(()=>{
+    document.getElementById('sync-dot').style.background='#4caf81';
+    document.getElementById('sync-txt').textContent='ซิงค์แล้ว ✓';
+  });
+}
 
 function loadDay(){
   const date=document.getElementById('f-date').value;
   if(!date)return;
-  const day=loadData()[date]||{};
+  const day=allData[date]||{};
   ['r1','r2','r3','r4','r5','r7','r8','r9','r10'].forEach(id=>{
     document.getElementById(id).value=day[id]||'';
   });
@@ -274,15 +309,17 @@ function saveDay(){
   if(!date){alert('กรุณาเลือกวันที่');return;}
   const r6=n('r4')-n('r5');
   const net=r6-n('r8')-n('r10');
-  const data=loadData();
-  data[date]={r1:n('r1'),r2:n('r2'),r3:n('r3'),r4:n('r4'),r5:n('r5'),r6,r7:n('r7'),r8:n('r8'),r9:n('r9'),r10:n('r10'),net};
-  saveData(data);
-  renderHist();
-  alert('บันทึกแล้ว ✅');
+  allData[date]={r1:n('r1'),r2:n('r2'),r3:n('r3'),r4:n('r4'),r5:n('r5'),r6,r7:n('r7'),r8:n('r8'),r9:n('r9'),r10:n('r10'),net};
+  document.getElementById('sync-dot').style.background='#D4AF37';
+  document.getElementById('sync-txt').textContent='กำลังบันทึก...';
+  saveData(allData).then(()=>{
+    renderHist();
+    alert('บันทึกแล้ว ✅ ซิงค์แล้ว ✓');
+  });
 }
 
 function renderHist(){
-  const data=loadData();
+  const data=allData;
   const keys=Object.keys(data).sort((a,b)=>b.localeCompare(a));
   const el=document.getElementById('hist-list');
   if(!keys.length){el.innerHTML='<div class="empty">ยังไม่มีข้อมูล</div>';return;}
@@ -310,7 +347,7 @@ function loadFromHist(date){
 }
 
 function exportData(){
-  const blob=new Blob([JSON.stringify(loadData(),null,2)],{type:'application/json'});
+  const blob=new Blob([JSON.stringify(allData,null,2)],{type:'application/json'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
   a.download=`nc_report_backup_${new Date().toISOString().slice(0,10)}.json`;
@@ -324,9 +361,9 @@ function importData(e){
   reader.onload=ev=>{
     try{
       const data=JSON.parse(ev.target.result);
-      saveData(data);
-      renderHist();
-      alert('นำเข้าสำเร็จ ✅');
+      set(ref(db,'report'),data).then(()=>{
+        alert('นำเข้าสำเร็จ ✅');
+      });
     }catch{alert('ไฟล์ไม่ถูกต้อง');}
   };
   reader.readAsText(file);
@@ -336,7 +373,7 @@ function importData(e){
 function renderMonthly(){
   const ym=document.getElementById('m-pick').value;
   if(!ym)return;
-  const data=loadData();
+  const data=allData;
   const days=Object.keys(data).filter(k=>k.startsWith(ym)).sort();
   let totUser=0,totDep=0,totWit=0,totBon=0,totNet=0,totDau=0;
   days.forEach(k=>{
@@ -379,12 +416,21 @@ function renderMonthly(){
   }).join('')+`<line x1="0" y1="${barH}" x2="${Math.max(totalW,W)}" y2="${barH}" stroke="#2a2a2a" stroke-width="1"/>`;
 }
 
+// Expose to window for onclick handlers
+window.doLogin=doLogin;
+window.doLogout=doLogout;
+window.saveDay=saveDay;
+window.loadDay=loadDay;
+window.loadFromHist=loadFromHist;
+window.exportData=exportData;
+window.importData=importData;
+window.renderMonthly=renderMonthly;
+window.calc=calc;
+
 const today=new Date().toISOString().slice(0,10);
 document.getElementById('f-date').value=today;
 document.getElementById('m-pick').value=today.slice(0,7);
 loadDay();
-renderHist();
-renderMonthly();
 </script>
 </body>
 </html>

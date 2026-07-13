@@ -69,6 +69,9 @@ body{background:#0d0d0d;color:#f0f0f0;font-family:-apple-system,BlinkMacSystemFo
 .modal-actions{display:flex;gap:8px;margin-top:16px;}
 .modal-save{flex:1;background:#D4AF37;color:#0d0d0d;border:none;border-radius:8px;padding:10px;font-size:14px;font-weight:600;cursor:pointer;}
 .modal-cancel{background:#2a2a2a;color:#888;border:none;border-radius:8px;padding:10px 16px;font-size:14px;cursor:pointer;}
+/* SYNC STATUS */
+.sync-bar{display:flex;align-items:center;gap:5px;padding:4px 16px;font-size:11px;color:#666;background:#0d0d0d;}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:#555;flex-shrink:0;}
 </style>
 </head>
 <body>
@@ -136,6 +139,7 @@ body{background:#0d0d0d;color:#f0f0f0;font-family:-apple-system,BlinkMacSystemFo
       <button class="logout-btn" onclick="doLogout()">🚪</button>
     </div>
   </div>
+  <div class="sync-bar"><span class="sync-dot" id="sync-dot"></span><span id="sync-txt">กำลังเชื่อมต่อ...</span></div>
 
   <div class="body">
     <!-- FORM เพิ่มพนักงาน -->
@@ -187,10 +191,35 @@ body{background:#0d0d0d;color:#f0f0f0;font-family:-apple-system,BlinkMacSystemFo
   </div>
 </div>
 
-<script>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js';
+import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCus5LIZm3VcDV7tWAxI0T4oOr229hWTlM",
+  authDomain: "namchok99dash.firebaseapp.com",
+  databaseURL: "https://namchok99dash-default-rtdb.firebaseio.com",
+  projectId: "namchok99dash",
+  storageBucket: "namchok99dash.firebasestorage.app",
+  messagingSenderId: "168525700910",
+  appId: "1:168525700910:web:7592d9fa28c3dd36b3a4bf"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+let staffData = [];
+let editId = null;
+
+// Keep in sync with Firebase
+onValue(ref(db,'staff'), snap => {
+  staffData = snap.val() || [];
+  document.getElementById('sync-dot').style.background='#4caf81';
+  document.getElementById('sync-txt').textContent='ซิงค์แล้ว ✓';
+  render();
+});
+
 const USERS=[{user:'admin',pass:'namchok99'},{user:'manager',pass:'nc2026'}];
-const KEY='nc_staff_v1';
-let editId=null;
 
 function doLogin(){
   const u=document.getElementById('l-user').value.trim();
@@ -202,8 +231,16 @@ function doLogin(){
 function doLogout(){sessionStorage.removeItem('nc_auth');document.getElementById('login-screen').classList.add('show');}
 if(sessionStorage.getItem('nc_auth')!=='1'){document.getElementById('login-screen').classList.add('show');}
 
-function load(){return JSON.parse(localStorage.getItem(KEY)||'[]');}
-function save(d){localStorage.setItem(KEY,JSON.stringify(d));}
+function load(){return staffData;}
+function save(d){
+  staffData=d;
+  document.getElementById('sync-dot').style.background='#D4AF37';
+  document.getElementById('sync-txt').textContent='กำลังบันทึก...';
+  return set(ref(db,'staff'),d).then(()=>{
+    document.getElementById('sync-dot').style.background='#4caf81';
+    document.getElementById('sync-txt').textContent='ซิงค์แล้ว ✓';
+  });
+}
 
 function formatDate(s){
   if(!s)return'';
@@ -225,24 +262,23 @@ function addStaff(){
     shift:document.getElementById('f-shift').value,
     salary:document.getElementById('f-salary').value,
   };
-  const data=load();
+  const data=[...staffData];
   data.unshift(staff);
-  save(data);
-  ['f-fname','f-lname','f-nick','f-phone','f-salary'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('f-pos').value='';
-  document.getElementById('f-start').value='';
-  document.getElementById('f-shift').value='';
-  render();
+  save(data).then(()=>{
+    ['f-fname','f-lname','f-nick','f-phone','f-salary'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('f-pos').value='';
+    document.getElementById('f-start').value='';
+    document.getElementById('f-shift').value='';
+  });
 }
 
 function deleteStaff(id){
   if(!confirm('ลบข้อมูลพนักงานคนนี้?'))return;
-  save(load().filter(x=>x.id!==id));
-  render();
+  save(staffData.filter(x=>x.id!==id));
 }
 
 function openEdit(id){
-  const s=load().find(x=>x.id===id);
+  const s=staffData.find(x=>x.id===id);
   if(!s)return;
   editId=id;
   document.getElementById('e-fname').value=s.fname||'';
@@ -265,7 +301,7 @@ function saveEdit(){
   if(!editId)return;
   const fname=document.getElementById('e-fname').value.trim();
   if(!fname){alert('กรุณากรอกชื่อ');return;}
-  const data=load();
+  const data=[...staffData];
   const idx=data.findIndex(x=>x.id===editId);
   if(idx===-1)return;
   data[idx]={...data[idx],
@@ -278,14 +314,13 @@ function saveEdit(){
     shift:document.getElementById('e-shift').value,
     salary:document.getElementById('e-salary').value,
   };
-  save(data);
-  closeEdit();
-  render();
+  save(data).then(()=>{
+    closeEdit();
+  });
 }
 
 function exportData(){
-  const data=load();
-  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const blob=new Blob([JSON.stringify(staffData,null,2)],{type:'application/json'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
   a.download=`nc_staff_backup_${new Date().toISOString().slice(0,10)}.json`;
@@ -300,9 +335,9 @@ function importData(e){
     try{
       const data=JSON.parse(ev.target.result);
       if(!Array.isArray(data))throw new Error();
-      save(data);
-      alert('นำเข้าสำเร็จ '+data.length+' คน ✅');
-      render();
+      set(ref(db,'staff'),data).then(()=>{
+        alert('นำเข้าสำเร็จ '+data.length+' คน ✅');
+      });
     }catch{alert('ไฟล์ไม่ถูกต้อง');}
   };
   reader.readAsText(file);
@@ -310,7 +345,7 @@ function importData(e){
 }
 
 function render(){
-  const data=load();
+  const data=staffData;
   document.getElementById('count').textContent=data.length+' คน';
   const el=document.getElementById('staff-list');
   if(!data.length){
@@ -341,7 +376,16 @@ function render(){
   }).join('');
 }
 
-render();
+// Expose to window for onclick handlers
+window.doLogin=doLogin;
+window.doLogout=doLogout;
+window.addStaff=addStaff;
+window.deleteStaff=deleteStaff;
+window.openEdit=openEdit;
+window.closeEdit=closeEdit;
+window.saveEdit=saveEdit;
+window.exportData=exportData;
+window.importData=importData;
 </script>
 </body>
 </html>
